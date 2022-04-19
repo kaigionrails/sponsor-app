@@ -14,7 +14,5 @@ class SponsorshipWelcomeJob < ApplicationJob
     SlackWebhookJob.perform_now(
       { text: ":tamago: *New sponsorship* (#{sponsorship.plan_name || '*OTHER*'}): #{sponsorship.name}  <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|Open>" },
     )
-
-    EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
   end
 end
