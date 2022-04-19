@@ -85,7 +85,7 @@ Rails.application.configure do
   # *.lo.example.org
   config.action_dispatch.tld_length = 2
 
-  config.x.org_name = "RubyKaigi"
+  config.x.org_name = ENV.fetch('ORG_NAME', 'Kaigi on Rails')
 
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS',  'sponsorapp@localhost')
   config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
