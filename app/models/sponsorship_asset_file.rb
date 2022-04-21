@@ -1,3 +1,5 @@
+require "google/cloud/storage"
+
 class SponsorshipAssetFile < ApplicationRecord
   REGION = ENV['S3_FILES_REGION']
   BUCKET = ENV['S3_FILES_BUCKET']
@@ -16,17 +18,15 @@ class SponsorshipAssetFile < ApplicationRecord
 
   def copy_to!(conference)
     dst = self.class.create!(prefix: "c-#{conference.id}/", extension: self.extension)
-    Aws::S3::Client.new(logger: Rails.logger, region: REGION).copy_object(
-      bucket: BUCKET,
-      copy_source: "#{BUCKET}/#{object_key}",
-      key: dst.object_key,
-    )
+    client = Google::Cloud::Storage.new
+    file = client.bucket(BUCKET).file(object_key, skip_lookup: true)
+    file.copy(dst.object_key)
     dst
   end
 
   def object_key
     raise unless self.persisted?
-    "#{PREFIX}#{prefix}#{handle}--#{id}"
+    "#{PREFIX}#{prefix}#{handle}--#{id}.#{extension}"
   end
 
   def make_session
@@ -38,14 +38,8 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def download_url
-    presigner = Aws::S3::Presigner.new(client: Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION))
-    presigner.presigned_url(
-      :get_object,
-      bucket: BUCKET,
-      key: object_key,
-      expires_in: 3600,
-      response_content_disposition: "attachment; filename=\"#{filename}\"",
-    )
+    client = Google::Cloud::Storage.new
+    client.bucket(BUCKET).file(object_key, skip_lookup: true).signed_url(method: "GET", expires: 300, version: :v4)
   end
 
   private def validate_ownership_not_changed
@@ -61,60 +55,15 @@ class SponsorshipAssetFile < ApplicationRecord
 
     attr_reader :file
 
-    def sts
-      @sts ||= Aws::STS::Client.new
-    end
-
-    def iam_policy
-      {
-        Version: '2012-10-17',
-        Statement: [
-          {
-            Effect: 'Allow',
-            Action: %w(
-              s3:PutObject
-            ),
-            Resource: "arn:aws:s3:::#{BUCKET}/#{file.object_key}",
-            Condition: {
-              StringEqualsIfExists: {
-                "s3:x-amz-storage-class" => "STANDARD",
-              },
-              Null: {
-                "s3:x-amz-server-side-encryption" => true,
-                "s3:x-amz-server-side-encryption-aws-kms-key-id" => true,
-                "s3:x-amz-website-redirect-location" => true,
-                # These cannot be applied unless a bucket has ObjectLockConfiguration, but to ensure safety
-                "s3:object-lock-legal-hold" => true,
-                "s3:object-lock-retain-until-date" => true,
-                "s3:object-lock-remaining-retention-days" => true,
-                # ACLs cannot be applied unless s3:PutObjectAcl
-              },
-            },
-          },
-        ],
-      }
-    end
-
-    def role_session
-      @role_session ||= sts.assume_role(
-        duration_seconds: 900,
-        role_arn: ROLE,
-        role_session_name: "file-#{file.id.to_s}",
-        policy: iam_policy.to_json,
-      )
+    def signed_url
+      client ||= Google::Cloud::Storage.new
+      client.bucket(BUCKET).bucket.signed_url(file.object_key, version: :v4, expires: 3600, method: 'PUT')
     end
 
     def as_json
       {
         id: file.id.to_s,
-        region: REGION,
-        bucket: BUCKET,
-        key: file.object_key,
-        credentials: {
-          access_key_id: role_session.credentials.access_key_id,
-          secret_access_key: role_session.credentials.secret_access_key,
-          session_token: role_session.credentials.session_token,
-        },
+        signed_url: signed_url
       }
     end
   end

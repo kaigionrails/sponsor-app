@@ -1,11 +1,9 @@
-import S3 from 'aws-sdk/clients/s3';
 import * as React from 'react';
 
 import SponsorshipAssetFileUploader from './SponsorshipAssetFileUploader';
 
 interface UploadState {
   uploader?: SponsorshipAssetFileUploader,
-  progress?: S3.ManagedUpload.Progress | null,
   error?: string | null,
 }
 
