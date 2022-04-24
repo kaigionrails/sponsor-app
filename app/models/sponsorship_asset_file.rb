@@ -57,7 +57,7 @@ class SponsorshipAssetFile < ApplicationRecord
 
     def signed_url
       client ||= Google::Cloud::Storage.new
-      client.bucket(BUCKET).bucket.signed_url(file.object_key, version: :v4, expires: 3600, method: 'PUT')
+      client.bucket(BUCKET).signed_url(file.object_key, version: :v4, expires: 3600, method: 'PUT')
     end
 
     def as_json
