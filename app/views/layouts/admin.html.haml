@@ -3,7 +3,8 @@
   %head
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
-    %title= yield(:title) || 'sponsor-app admin'
+    - title = yield(:title)
+    %title= title.empty? ?  "#{Rails.application.config.x.org_name} sponsor-app admin" : title
     = csrf_meta_tags
     = csp_meta_tag
 
@@ -14,7 +15,7 @@
       %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
   %body
     %nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      %a.navbar-brand{href: '/'} Sponsorships Admin
+      %a.navbar-brand{href: '/'} #{Rails.application.config.x.org_name} Sponsorships Admin
       %button.navbar-toggler{type: :button, data: {toggle: :collapse, target: '#navbarNavAltMarkup'}, aria: {controls: 'navbarNavAltMarkup', expanded: false, label: 'Toggle navigation'}}
         %span.navbar-toggler-icon
       .collapse.navbar-collapse#navbarNavAltMarkup
