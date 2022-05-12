@@ -28,6 +28,7 @@
           - else
             %p.card-text
               %span.badge.badge-danger= t('.booth_details.not_submitted')
+            %p= t('.booth_details.body')
             %p.card-text= link_to t('.booth_details.new'), new_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
 
   .col-md-6
@@ -118,4 +119,3 @@
         %p.card-text= t('.contact_help')
         %p.card-text
           %a{href: "mailto:#{@conference.contact_email_address}"}= @conference.contact_email_address
-
