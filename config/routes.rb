@@ -14,6 +14,7 @@ Rails.application.routes.draw do
         get :sponsors_json
         get :asset_urls
         get :table_view
+        get :billing
       end
 
       resource :booth_assignment, only: %i(show update)
