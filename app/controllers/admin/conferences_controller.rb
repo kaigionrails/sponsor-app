@@ -42,6 +42,7 @@ class Admin::ConferencesController < Admin::ApplicationController
   end
 
   def billing
+  # https://biz.moneyforward.com/support/invoice/guide/document02/do06.html#ttl01
     @billings = []
 
     @billings << %w[csv_type(変更不可) 行形式 取引先名称 件名 請求日 お支払期限 請求書番号 売上計上日 メモ タグ 小計 消費税 合計金額 取引先敬称 取引先郵便番号 取引先都道府県 取引先住所1 取引先住所2 取引先部署 取引先担当者役職 取引先担当者氏名 自社担当者氏名 備考 振込先 入金ステータス メール送信ステータス 郵送ステータス ダウンロードステータス 品名 品目コード 単価 数量 単位 詳細 金額 源泉徴収 品目消費税率]
