@@ -69,6 +69,8 @@
       %h5.card-header
         Sponsorships
       .card-body
+        .mb-4
+          = link_to "Generate YAML", sponsors_yml_conference_path(), class: 'btn btn-secondary'
         - @conference.sponsorships.where(withdrawn_at: nil).includes(:plan).order(id: :asc).group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
           %h6
             = plan&.name || 'Undetermined'
