@@ -1,4 +1,6 @@
 class Admin::ConferencesController < Admin::ApplicationController
+  TAX_RATE = 0.1
+
   before_action :require_unrestricted_staff, only: [:index, :new, :create]
   before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view, :billing]
 
@@ -53,9 +55,9 @@ class Admin::ConferencesController < Admin::ApplicationController
     sponsorships = @conference.sponsorships.active.includes_contacts.includes(:plan).order(:plan_id, :id)
 
     sponsorships.each.with_index(1) do |sponsor, i|
-      subtotal = "#{sponsor.plan.price_text&.delete('万円')}0000".to_i
+      subtotal = sponsor.plan.price
       subtotal += booth_price if sponsor.booth_assigned
-      tax = (subtotal * 0.1).to_i
+      tax = (subtotal * TAX_RATE).to_i
 
       @billings << [30101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'),"#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name,  nil, subtotal, tax, subtotal + tax, sponsor.billing_contact.organization, nil, sponsor.billing_contact.address, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
 
