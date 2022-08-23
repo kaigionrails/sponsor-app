@@ -26,4 +26,11 @@ class Plan < ApplicationRecord
     # TODO:
     (words_limit || 0) * 1.1
   end
+
+  # Used in billing CSV
+  # TODO; Should be replaced with integer price?
+  # This method doesn't work when price_text is something like '25万5千円'
+  def price
+    "#{price_text&.delete('万円')}0000".to_i
+  end
 end
