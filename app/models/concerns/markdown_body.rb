@@ -8,6 +8,6 @@ module MarkdownBody
   end
 
   def render_html
-    CommonMarker.render_html(body, %i(GITHUB_PRE_LANG), %i(tagfilter autolink table strikethrough))
+    CommonMarker.render_html(body, %i(GITHUB_PRE_LANG HARDBREAKS), %i(tagfilter autolink table strikethrough))
   end
 end
