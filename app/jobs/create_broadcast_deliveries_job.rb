@@ -91,6 +91,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         email_lines.to_s.each_line.map do |email|
           Recipient.new(
             email: email.chomp,
+            email_ccs: []
           )
         end
       end
