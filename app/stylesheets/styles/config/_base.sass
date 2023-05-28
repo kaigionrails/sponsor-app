@@ -15,6 +15,13 @@ a
     color: $link-hover
     text-decoration: none
 
+a.black
+  color: $black
+  &:hover,
+  &:focus
+    color: $black
+
+
 img
   max-width: 100%
 
@@ -54,6 +61,9 @@ nav.navbar.navbar-expand-lg a.dropdown-item
     background-color: $btn-primary-bg-hover
     color: #000
     border-color: $btn-primary-border-hover
+
+.btn-primary.black
+  border: 1px solid $black
 
 .btn-primary:not(:disabled):not(.disabled):active,
 .btn-primary:not(:disabled):not(.disabled).active,
