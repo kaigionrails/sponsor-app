@@ -183,7 +183,7 @@
         .row
         %p.card-text
           #{@sponsorship.contact.name}
-          = link_to @sponsorship.contact.email, front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), target: '_blank'
+          = mail_to @sponsorship.contact.email, @sponsorship.contact.email
         %p.card-text
           - if @sponsorship.contact.unit
             = @sponsorship.contact.unit
@@ -201,7 +201,7 @@
       .card-body
         %p.card-text
           #{@sponsorship.billing_contact.name}
-          = link_to @sponsorship.billing_contact.email, front_mail_to_link(@sponsorship.billing_contact.email, from: @conference.contact_email_address), target: '_blank'
+          = mail_to @sponsorship.billing_contact.email, @sponsorship.billing_contact.email
         %p.card-text
           - if @sponsorship.billing_contact.unit
             = @sponsorship.billing_contact.unit
