@@ -43,11 +43,11 @@ class Admin::ConferencesController < Admin::ApplicationController
     }.to_json
   end
 
+  # https://biz.moneyforward.com/support/invoice/faq/invoice/invoice002.html
   def billing
-  # https://biz.moneyforward.com/support/invoice/guide/document02/do06.html#ttl01
     @billings = []
 
-    @billings << %w[csv_type(変更不可) 行形式 取引先名称 件名 請求日 お支払期限 請求書番号 売上計上日 メモ タグ 小計 消費税 合計金額 取引先敬称 取引先郵便番号 取引先都道府県 取引先住所1 取引先住所2 取引先部署 取引先担当者役職 取引先担当者氏名 自社担当者氏名 備考 振込先 入金ステータス メール送信ステータス 郵送ステータス ダウンロードステータス 品名 品目コード 単価 数量 単位 詳細 金額 源泉徴収 品目消費税率]
+    @billings << %w[csv_type(変更不可) 行形式 取引先名称 件名 請求日 お支払期限 請求書番号 売上計上日 メモ タグ 小計 消費税 合計金額 取引先敬称 取引先郵便番号 取引先都道府県 取引先住所1 取引先住所2 取引先部署 取引先担当者役職 取引先担当者氏名 自社担当者氏名 備考 振込先 入金ステータス メール送信ステータス 郵送ステータス ダウンロードステータス 納品日 品名 品目コード 単価 数量 単位 納品書番号 詳細 金額 品目消費税率]
 
     billing_day = params[:billing_day] ? Date.parse(params[:billing_day]) : Date.today
     booth_price = params[:booth_price].to_i
@@ -59,12 +59,12 @@ class Admin::ConferencesController < Admin::ApplicationController
       subtotal += booth_price if sponsor.booth_assigned
       tax = (subtotal * TAX_RATE).to_i
 
-      @billings << [30101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'),"#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name,  nil, subtotal, tax, subtotal + tax, sponsor.billing_contact.organization, nil, sponsor.billing_contact.address, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
+      @billings << [40101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'),"#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name,  nil, subtotal, tax, subtotal + tax, sponsor.billing_contact.organization, nil, sponsor.billing_contact.address, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
 
-      @billings << [30101, '品目'] + Array.new(26) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, subtotal, 1, nil, nil, subtotal, '含まない', '10%']
+      @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, sponsor.plan.price, 1, nil, nil, nil, sponsor.plan.price, '10%']
 
       if sponsor.booth_assigned
-        @billings << [30101, '品目'] + Array.new(26) + ["#{@conference.name} 協賛費用 (ブース出展)", nil, booth_price, 1, nil, nil, booth_price, '含まない', '10%']
+        @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (ブース出展)", nil, booth_price, 1, nil, nil, nil, booth_price, '10%']
       end
     end
 
