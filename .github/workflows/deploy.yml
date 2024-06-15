@@ -3,7 +3,6 @@ on:
     branches:
       - kaigionrails
       - "kaigionrails*" # e.g. kaigionrails2023, kaigionrails2024
-      - deploy-kor # for test
 jobs:
   build:
     runs-on: ubuntu-latest
