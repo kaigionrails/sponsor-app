@@ -31,3 +31,6 @@
 yarn-debug.log*
 .yarn-integrity
 vendor
+
+# auto generate file
+deploy/apprunner.json
