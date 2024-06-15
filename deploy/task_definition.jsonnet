@@ -32,7 +32,7 @@
           value: 'sponsorships@kaigionrails.org',
         },
         {
-          name: 'DETAULT_EMAIL_HOST',
+          name: 'DEFAULT_EMAIL_HOST',
           value: 'sponsorships.kaigionrails.org',
         },
         {
