@@ -52,7 +52,7 @@ jobs:
         with:
           aws-region: us-west-2
           role-skip-session-tagging: false
-          role-to-assume: "arn:aws:iam::861452569181:role/SponsorAppDeployer"
+          role-to-assume: "arn:aws:iam::861452569180:role/SponsorAppDeployer"
       - uses: kayac/ecspresso@v2
         with:
           version: latest
