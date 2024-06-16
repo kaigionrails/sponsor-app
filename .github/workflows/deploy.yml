@@ -1,8 +1,8 @@
 on:
   push:
     branches:
-      - kaigionrails
-      - "kaigionrails*" # e.g. kaigionrails2023, kaigionrails2024
+      # - kaigionrails
+      - "kaigionrails2024"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,6 +38,9 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: "deploy"
+      cancel-in-progress: false
     needs: ["build"]
     permissions:
       id-token: write
