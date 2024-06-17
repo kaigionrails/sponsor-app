@@ -67,6 +67,10 @@
           name: 'RAILS_SERVE_STATIC_FILES',
           value: 'enabled',
         },
+        {
+          name: 'SENTRY_ENV',
+          value: 'production',
+        },
       ],
       secrets: [
         {
@@ -132,6 +136,10 @@
         {
           name: 'SLACK_WEBHOOK_URL',
           valueFrom: $.parameterStoreArn('SLACK_WEBHOOK_URL'),
+        },
+        {
+          name: 'SENTRY_DSN',
+          valueFrom: $.parameterStoreArn('SENTRY_DSN'),
         },
         {
           name: 'TITO_API_TOKEN',
