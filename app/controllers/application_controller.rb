@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     case
-    when params[:hl] 
+    when params[:hl]
       if I18n.available_locales.include?(params[:hl].to_sym)
         session[:hl] = params[:hl].to_sym
       else
@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
   helper_method def current_available_sponsorships
     return @current_available_sponsorships if defined? @current_available_sponsorships
     return nil unless session[:sponsorship_ids]
-    @current_available_sponsorships = Sponsorship.includes(:conference).where(id: session[:sponsorship_ids]).not_withdrawn.order(id: :desc)
+    @current_available_sponsorships = Sponsorship.includes(:conference).where(id: session[:sponsorship_ids]).order(id: :desc)
   end
 
   def require_staff
