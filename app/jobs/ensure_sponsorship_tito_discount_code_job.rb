@@ -24,7 +24,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       )
     end
   end
-  
+
   def code
     "#{code_prefix}_#{@sponsorship.id}_#{@sponsorship.ticket_key[0,12]}"
   end
