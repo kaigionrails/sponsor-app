@@ -34,3 +34,4 @@ vendor
 
 # auto generate file
 deploy/apprunner.json
+deploy/staging/apprunner.json
