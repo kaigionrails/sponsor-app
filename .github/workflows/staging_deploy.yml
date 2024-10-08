@@ -62,5 +62,5 @@ jobs:
           version: latest
       - run: ecspresso run --config deploy/staging/ecspresso.jsonnet --ext-str IMAGE_SHA=${{ github.sha }} --overrides-file deploy/staging/runtask-db-migrate.jsonnet
       - run: ecspresso deploy --config deploy/staging/ecspresso.jsonnet --ext-str IMAGE_SHA=${{ github.sha }}
-      # - run: jsonnet deploy/staging/apprunner.jsonnet --ext-str IMAGE_SHA=${{ github.sha }} > deploy/staging/apprunner.json
-      # - run: aws apprunner update-service --cli-input-json file://deploy/staging/apprunner.json
+      - run: jsonnet deploy/staging/apprunner.jsonnet --ext-str IMAGE_SHA=${{ github.sha }} > deploy/staging/apprunner.json
+      - run: aws apprunner update-service --cli-input-json file://deploy/staging/apprunner.json
