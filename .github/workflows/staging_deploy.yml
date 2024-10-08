@@ -4,7 +4,6 @@ on:
       # - kaigionrails
       - "kaigionrails2024"
       - "staging"
-      - "prepare-staging" # temp
 jobs:
   build:
     runs-on: ubuntu-latest
