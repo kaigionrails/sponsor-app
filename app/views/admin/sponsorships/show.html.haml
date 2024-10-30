@@ -184,6 +184,11 @@
         %p.card-text
           #{@sponsorship.contact.name}
           = mail_to @sponsorship.contact.email, @sponsorship.contact.email
+        - if @sponsorship.contact.email_cc
+          %p.card-text
+            = t('activerecord.models.contact.email_cc')
+            %br
+            #{@sponsorship.contact.email_cc}
         %p.card-text
           - if @sponsorship.contact.unit
             = @sponsorship.contact.unit
