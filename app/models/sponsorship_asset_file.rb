@@ -38,8 +38,10 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def download_url
-    client = Google::Cloud::Storage.new
-    client.bucket(BUCKET).file(object_key, skip_lookup: true).signed_url(method: "GET", expires: 300, version: :v4)
+    Rails.cache.fetch("#{cache_key_with_version}", expires_in: 5.minutes) do
+      client = Google::Cloud::Storage.new
+      client.bucket(BUCKET).file(object_key, skip_lookup: true).signed_url(method: "GET", expires: 300, version: :v4)
+    end
   end
 
   private def validate_ownership_not_changed
