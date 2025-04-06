@@ -12,7 +12,6 @@ gem 'addressable'
 gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'
-gem 'google-cloud-storage'
 gem 'omniauth', '< 2'
 gem 'omniauth-github'
 gem 'octokit'
