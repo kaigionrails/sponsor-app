@@ -16,18 +16,6 @@
       command: ['bundle', 'exec', 'sidekiq', '--queue', 'default', '--queue', 'mailers'],
       environment: [
         {
-          name: 'AWS_ACCESS_KEY_ID',
-          value: 'sample',
-        },
-        {
-          name: 'AWS_REGION',
-          value: 'ap-northeast-1',
-        },
-        {
-          name: 'AWS_SECRET_ACCESS_KEY',
-          value: 'sample',
-        },
-        {
           name: 'DEFAULT_EMAIL_ADDRESS',
           value: 'sponsorships@kaigionrails.org',
         },
