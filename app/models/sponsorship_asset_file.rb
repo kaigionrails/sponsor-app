@@ -26,7 +26,7 @@ class SponsorshipAssetFile < ApplicationRecord
 
   def object_key
     raise unless self.persisted?
-    "#{PREFIX}#{prefix}#{handle}--#{id}"
+    "#{PREFIX}#{prefix}#{handle}--#{id}.#{extension}"
   end
 
   def make_session
