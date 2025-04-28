@@ -7,6 +7,7 @@ ja:
         url: 'URL'
         profile: '紹介文'
         booth_requested: 'ブース出展'
+        commercial_message_movie_requested: 'CM映像放送'
         number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
 
@@ -44,6 +45,8 @@ ja:
               taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
             booth_requested:
               not_eligible: "は選択されたスポンサープランでは対象外です"
+            commercial_message_movie_requested:
+              not_eligible: "は選択されたスポンサープランでは対象外です"
             profile:
               too_long: "が長過ぎます。選択されたプランでは %{maximum} 文字程度が上限となっています。"
 
@@ -54,6 +57,7 @@ ja:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'ブース出展する'
+        commercial_message_movie_requested: 'CM映像を掲載する'
     submit:
       ticket:
         create: '登録'
@@ -120,6 +124,7 @@ ja:
           zero: 'ブースなし'
           one: 'ブース出展可能'
           other: 'ブース出展可能'
+        commercial_message_movie: 'CM映像放映可能'
         words_limit:
           zero: '0文字'
           one: '1文字'
@@ -130,6 +135,8 @@ ja:
       plan_closed: '受付期間終了'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
+      commercial_message_movie: 'CM映像放映'
+      commercial_message_movie_uneligible_plan_selected: '選択されたプランではCM映像放映はできません (%{plans} プランのみが対象となります)'
       information: 'サイト掲載情報'
       information_help: |
         ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。
@@ -173,6 +180,10 @@ ja:
         assigned: 'ブース有り'
         requested: 'ブース対応 (申し込み済)'
         eligible: 'ブース対応 (申し込み無し)'
+      commercial_message_movie:
+        assigned: 'CM映像放映あり'
+        requested: 'CM映像放映対応 (申し込み済)'
+        eligible: 'CM映像放映対応 (申し込み無し)'
       undetermined_plan: '未決定'
       undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
       accepted: "確定済"

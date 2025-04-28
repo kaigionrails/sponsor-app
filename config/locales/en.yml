@@ -44,6 +44,8 @@ en:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:
               not_eligible: "is not eligible in your selected plan."
+            commercial_message_movie_requested:
+              not_eligible: "is not eligible in your selected plan."
             profile:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
@@ -54,6 +56,7 @@ en:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
+        commercial_message_movie_requested: 'Request a Commercial Message Movie'
     submit:
       ticket:
         create: 'Submit'
@@ -119,6 +122,7 @@ en:
           zero: 'No booth'
           one: 'Eligible for Booth'
           other: 'Eligible for Booth'
+        commercial_message_movie: 'Eligible for Commercial Message Movie'
         words_limit:
           zero: '0 word'
           one: 'About 1 word'
@@ -129,6 +133,8 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
+      commercial_message_movie: 'Commercial Message Movie'
+      commercial_message_movie_uneligible_plan_selected: 'Your selected plan is uneligible for commercial message movies; only available in %{plans} plan'
       information: 'Sponsor Information'
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
@@ -172,6 +178,10 @@ en:
         assigned: 'Sponsor Booth Assigned'
         requested: 'Sponsor Booth Requested'
         eligible: 'Sponsor Booth Eligible'
+      commercial_message_movie:
+        assigned: 'Commercial Message Movie Assigned'
+        requested: 'Commercial Message Movie Requested'
+        eligible: 'Commercial Message Movie Eligible'
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
       accepted: "Accepted / Finalized"
