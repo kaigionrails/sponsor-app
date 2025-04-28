@@ -145,6 +145,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :hidden,
       :no_plan_allowed,
       :allow_restricted_access,
+      :commercial_message_movie_capacity,
     )
   end
 end
