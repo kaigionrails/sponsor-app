@@ -81,13 +81,15 @@
       - conference.plans.each do |plan|
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', commercial_message_movie: plan.commercial_message_movie_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
             = plan.name
             %small<
               #{plan.price_text}
               , #{plan.number_of_guests}
               - if plan.booth_eligible?
                 , #{plan.booth_size} booth
+              - if plan.commercial_message_movie_eligible?
+                , cm movie
               - if plan.talkable?
                 , Talk
 
@@ -126,6 +128,21 @@
       .form-check
         = form.check_box :booth_assigned, class: 'form-check-input'
         = form.label :booth_assigned, class: 'form-check-label'
+
+  %section.py-2
+    .form-group
+      %h3 Commercial Message Movie
+
+    .form-group.sponsorships_form_booth_request
+      .form-check
+        = form.check_box :commercial_message_movie_requested, class: 'form-check-input'
+        = form.label :commercial_message_movie_requested, class: 'form-check-label'
+      %small.d-none.sponsorships_form_commertial_message_movie_request_uneligible.form-text.text-small.text-info Selected plan is uneligible for commertial message movie
+
+    .form-group
+      .form-check
+        = form.check_box :commercial_message_movie_assigned, class: 'form-check-input'
+        = form.label :commercial_message_movie_assigned, class: 'form-check-label'
 
   %section.py-2
     .form-group
