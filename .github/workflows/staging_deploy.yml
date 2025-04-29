@@ -2,7 +2,7 @@ on:
   push:
     branches:
       # - kaigionrails
-      - "kaigionrails2024"
+      - "kaigionrails2025"
       - "staging"
 jobs:
   build:
