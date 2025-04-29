@@ -48,6 +48,13 @@
             %p.card-text= t('.booth.requested')
           - when @sponsorship.plan&.booth_eligible?
             %p.card-text= t('.booth.eligible')
+          - case
+          - when @sponsorship.commercial_message_movie_assigned
+            %p.card-text= t('.commercial_message_movie.assigned')
+          - when @sponsorship.commercial_message_movie_requested
+            %p.card-text= t('.commercial_message_movie.requested')
+          - when @sponsorship.plan&.commercial_message_movie_eligible?
+            %p.card-text= t('.commercial_message_movie.eligible')
         - else
           %h5.card-title= t('.undetermined_plan')
           %p.card-text= t('.undetermined_plan_help')

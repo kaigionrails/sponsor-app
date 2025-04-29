@@ -76,6 +76,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_plan_change, on: :update_by_user
   validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility, on: :update_by_user
+  validate :validate_commercial_message_movie_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
   validate :policy_agreement
@@ -182,6 +183,8 @@ class Sponsorship < ApplicationRecord
       "customization_request" => customization_request&.body,
       "booth_requested" => booth_requested,
       "booth_assigned" => booth_assigned,
+      "commercial_message_movie_requested" => commercial_message_movie_requested,
+      "commercial_message_movie_assigned" => commercial_message_movie_assigned,
       "name" => name,
       "url" => url,
       "profile" => profile,
@@ -262,6 +265,12 @@ class Sponsorship < ApplicationRecord
   def validate_booth_eligibility
     if booth_requested && !(plan&.booth_eligible?)
       errors.add :booth_requested, :not_eligible
+    end
+  end
+
+  def validate_commercial_message_movie_eligibility
+    if commercial_message_movie_requested && !(plan&.commercial_message_movie_eligible?)
+      errors.add :commercial_message_movie_requested, :not_eligible
     end
   end
 

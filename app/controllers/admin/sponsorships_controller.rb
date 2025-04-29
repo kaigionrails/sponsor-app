@@ -55,10 +55,12 @@ class Admin::SponsorshipsController < Admin::ApplicationController
       :profile,
       :logo_key,
       :booth_requested,
+      :commercial_message_movie_requested,
 
       :customization,
       :customization_name,
       :booth_assigned,
+      :commercial_message_movie_assigned,
 
       :suspended,
       :accepted,

@@ -51,6 +51,12 @@
   .form-group
     .form-check
       %label.form-check-label
+        = form.check_box :commercial_message_movie_eligible, class: 'form-check-input'
+        = form.label :commercial_message_movie_eligible, "", class: 'form-check-label'
+
+  .form-group
+    .form-check
+      %label.form-check-label
         = form.check_box :auto_acceptance, class: 'form-check-input'
         = form.label :auto_acceptance, "", class: 'form-check-label'
 

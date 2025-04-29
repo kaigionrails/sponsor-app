@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_20_121933) do
+ActiveRecord::Schema.define(version: 2025_04_13_100015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,6 +91,7 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
     t.boolean "no_plan_allowed", default: true, null: false
     t.boolean "allow_restricted_access"
     t.string "tito_slug"
+    t.integer "commercial_message_movie_capacity", default: 0, null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
@@ -147,6 +148,8 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
     t.datetime "updated_at", null: false
     t.text "ticket_help"
     t.text "ticket_help_html"
+    t.text "commercial_message_movie_help"
+    t.text "commercial_message_movie_help_html"
     t.index ["conference_id", "locale"], name: "index_form_descriptions_on_conference_id_and_locale", unique: true
     t.index ["conference_id"], name: "index_form_descriptions_on_conference_id"
   end
@@ -174,6 +177,7 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
     t.integer "words_limit"
     t.boolean "auto_acceptance", default: true, null: false
     t.datetime "closes_at"
+    t.boolean "commercial_message_movie_eligible", default: false, null: false
     t.index ["conference_id", "rank"], name: "index_plans_on_conference_id_and_rank"
     t.index ["conference_id"], name: "index_plans_on_conference_id"
   end
@@ -257,6 +261,8 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
     t.datetime "withdrawn_at"
     t.string "ticket_key", null: false
     t.datetime "accepted_at"
+    t.boolean "commercial_message_movie_requested", default: false, null: false
+    t.boolean "commercial_message_movie_assigned", default: false, null: false
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
     t.index ["conference_id", "ticket_key"], name: "index_sponsorships_on_conference_id_and_ticket_key", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
@@ -296,7 +302,7 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
   end
 
   create_table "tito_discount_codes", force: :cascade do |t|
-    t.integer "sponsorship_id", null: false
+    t.bigint "sponsorship_id", null: false
     t.integer "kind", null: false
     t.string "tito_discount_code_id", null: false
     t.string "code", null: false

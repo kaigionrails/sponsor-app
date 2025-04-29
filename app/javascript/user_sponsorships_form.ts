@@ -78,6 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const uneligibleHelpTextElem = formElem.querySelector(
         ".sponsorships_form_booth_request_uneligible"
       ) as Element;
+      const commercialMessageMovieCheckbox = formElem.querySelector(
+        ".sponsorships_form_commercial_message_movie_request input[type=checkbox]"
+      ) as HTMLInputElement;
+      const commercialMessageMovieHelpTextElem = formElem.querySelector(
+        ".sponsorships_form_commercial_message_movie_uneligible"
+      ) as Element;
       const customizationRequestField = document.querySelector(
         ".sponsorships_form_customization_request"
       ) as HTMLTextAreaElement;
@@ -96,6 +102,15 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           uneligibleHelpTextElem.classList.remove("d-none");
           boothCheckbox.disabled = true;
+        }
+
+        if (e.dataset.commercialMessageMovie == "1") {
+          console.log("a")
+          commercialMessageMovieHelpTextElem.classList.add("d-none");
+          commercialMessageMovieCheckbox.disabled = false;
+        } else {
+          commercialMessageMovieHelpTextElem.classList.remove("d-none");
+          commercialMessageMovieCheckbox.disabled = true;
         }
 
         const wordsLimitHelp = e.dataset.wordsLimitHelp;

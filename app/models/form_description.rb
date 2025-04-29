@@ -11,6 +11,7 @@ class FormDescription < ApplicationRecord
       booth_help
       policy_help
       ticket_help
+      commercial_message_movie_help
     ).each do |field|
       self[:"#{field}_html"] = CommonMarker.render_html(self[field], %i(GITHUB_PRE_LANG), %i(tagfilter autolink table strikethrough))
     end
