@@ -142,9 +142,10 @@ ja:
         ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。
       logo: 'ロゴ'
       download_logo: '(以前にアップロードしたファイルをダウンロードする)'
-      logo_help: |
-        Webサイトや会場にて掲示するため、ロゴファイルをアップロードしてください。形式はベクター形式 (.ai, .svg, .eps, .pdf 等) でお願い致します。
-        複数ファイルになる場合、zip 形式で圧縮ください。
+      logo_help_html: |
+        Webサイトや会場にて掲示するため、ロゴファイルをアップロードしてください。
+        ロゴファイル画像には規定の仕様形式がございます。
+        <a href="https://esa-pages.io/p/sharing/14929/posts/628/b8d3eb89cc8ad85d0573.html">テンプレートREADME</a>をご確認の上、提出をお願いいたします。
       tickets: 'Attendee チケット'
       tickets_included_in_plan: 'スポンサープランに含まれている枚数'
       tickets_additionally_request: '追加する枚数'

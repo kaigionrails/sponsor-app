@@ -140,8 +140,10 @@ en:
         Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
-      logo_help: |
-        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg). If you have multiple files, archive them into a .zip file.
+      logo_help_html: |
+        Upload your company logo file for the sponsors page in our website, and the venue onsite.
+        There are specific format requirements for the logo image file.
+        Please refer to <a href="https://esa-pages.io/p/sharing/14929/posts/628/b8d3eb89cc8ad85d0573.html">the template README</a> before submitting.
       others_help: |
         Use the following field for anything you want let us know in advance.
       tickets: 'Attendee Tickets'

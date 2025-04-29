@@ -177,7 +177,7 @@
     .form-group
       %h3= t('.logo')
 
-      %p= t('.logo_help')
+      %p= t('.logo_help_html')
 
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
       = form.hidden_field :asset_file_id
