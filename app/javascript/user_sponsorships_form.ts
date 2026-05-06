@@ -128,7 +128,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     formElem
-      .querySelectorAll<HTMLElement>(".sponsorships_form_fallback_section")
+      .querySelectorAll<HTMLElement>(
+        ".sponsorships_form_fallback_section",
+      )
       .forEach((section) => {
         const fallbackOptionSelect = section.querySelector<HTMLSelectElement>(
           'select[name="sponsorship[fallback_option]"]',

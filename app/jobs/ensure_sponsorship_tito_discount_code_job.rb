@@ -72,7 +72,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     }.fetch(@kind)
   end
 
-  def release_slug
+  def release_slugs
     {
       'attendee' => %w(sponsor),
       'booth_staff' => %w(exhibitor),

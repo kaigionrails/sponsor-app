@@ -374,7 +374,7 @@ en:
       notice: 'The booth plan has been updated.'
     form:
       header: 'Booth Details'
-      help: "We will check to see if there is any conflict with the event's rules of use, etc. Please inform us of the details of your booth and project."
+      help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
 
   sponsor_events:

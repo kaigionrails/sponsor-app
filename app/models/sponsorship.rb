@@ -155,7 +155,7 @@ class Sponsorship < ApplicationRecord
   end
 
   def word_count
-    profile&.grapheme_clusters&.size || 0
+    profile&.scan(/[\w\-'’]+/)&.size || 0
   end
 
   def policy_agreement
