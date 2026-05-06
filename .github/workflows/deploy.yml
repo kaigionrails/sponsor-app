@@ -10,6 +10,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    outputs:
+      image-tag: "${{ steps.login-ecr-usw2.outputs.registry }}/sponsor-app:${{ github.sha }}"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
@@ -44,24 +46,52 @@ jobs:
     concurrency:
       group: "deploy"
       cancel-in-progress: false
+    environment:
+      name: production
+      url: https://sponsorships.kaigionrails.org
     needs: ["build"]
     permissions:
       id-token: write
       contents: read
     env:
       AWS_REGION: us-west-2
+      IMAGE_URI: ${{ needs.build.outputs.image-tag }}
     steps:
-      - run: sudo apt-get update && sudo apt-get install jsonnet
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           aws-region: us-west-2
           role-skip-session-tagging: false
           role-to-assume: "arn:aws:iam::861452569180:role/SponsorAppDeployer"
-      - uses: kayac/ecspresso@31b27e71a464a773484fc73cf5eb0a25c4723038 # v2.8.3
+      - run: 'aws lambda update-function-code --function-name sponsor-app-runner-production --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-runner-production'
+      - run: 'bundle exec ./deploy/lambrunner.rb sponsor-app-runner-production bundle exec rake db:migrate'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-lambdakiq-production --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-lambdakiq-production'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-web-production --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-web-production'
+
+  # TODO: DRY
+  staging-deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "staging-deploy"
+      cancel-in-progress: false
+    environment:
+      name: staging
+      url: https://sponsorships-staging.kaigionrails.org
+    needs: ["build"]
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      AWS_REGION: us-west-2
+      IMAGE_URI: ${{ needs.build.outputs.image-tag }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
-          version: latest
-      - run: ecspresso run --config deploy/ecspresso.jsonnet --ext-str IMAGE_SHA=${{ github.sha }} --overrides-file deploy/runtask-db-migrate.jsonnet
-      - run: ecspresso deploy --config deploy/ecspresso.jsonnet --ext-str IMAGE_SHA=${{ github.sha }}
-      - run: jsonnet deploy/apprunner.jsonnet --ext-str IMAGE_SHA=${{ github.sha }} > deploy/apprunner.json
-      - run: aws apprunner update-service --cli-input-json file://deploy/apprunner.json
+          aws-region: us-west-2
+          role-skip-session-tagging: false
+          role-to-assume: "arn:aws:iam::861452569180:role/SponsorAppDeployer"
+      - run: 'aws lambda update-function-code --function-name sponsor-app-runner-staging --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-runner-staging'
+      - run: 'bundle exec ./deploy/lambrunner.rb sponsor-app-runner-staging bundle exec rake db:migrate'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-lambdakiq-staging --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-lambdakiq-staging'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-web-staging --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-web-staging'
