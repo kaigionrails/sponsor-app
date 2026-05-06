@@ -1,8 +1,8 @@
 on:
   push:
     branches:
-      # - kaigionrails
-      - "kaigionrails2024"
+      - kaigionrails
+
 jobs:
   build:
     runs-on: ubuntu-latest
