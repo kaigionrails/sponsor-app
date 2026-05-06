@@ -3,16 +3,29 @@
   %head
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
-    - title = yield(:title)
-    %title= title.empty? ?  "#{Rails.application.config.x.org_name} sponsor-app" : title
-    = csrf_meta_tags
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
+    - page_title = yield(:title)
+    - site_name = "#{Rails.application.config.x.org_name} Sponsorships Portal"
+    - if page_title.present?
+      - conf = @conference || current_conference
+      - if conf
+        %title= "#{page_title} | #{conf.name} | #{site_name}"
+      - else
+        %title= "#{page_title} | #{site_name}"
+    - else
+      %title= site_name
+    - unless @cacheable
+      = csrf_meta_tags
     = csp_meta_tag
+    = vite_stylesheet_tag 'application.css'
 
-    = stylesheet_pack_tag 'vendor', media: 'all'
-    = stylesheet_pack_tag 'application', media: 'all'
+    %meta{name: 'rk:sentry-dsn', content: Rails.configuration.x.sentry.dsn}
+    %meta{name: 'rk:release', content: Rails.configuration.x.release.release}
 
-    - if Rails.application.config.x.sentry.dsn.present?
-      %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
+    = vite_client_tag
   %body
     %nav.navbar.navbar-expand-lg.navbar-dark
       %a.navbar-brand{href: '/'}= "#{Rails.application.config.x.org_name} #{t('.brand')}"
@@ -54,5 +67,4 @@
 
       %main
         = yield
-    = javascript_pack_tag 'vendor'
-    = javascript_pack_tag 'application'
+    = vite_typescript_tag 'application'

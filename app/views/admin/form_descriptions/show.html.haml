@@ -1,9 +1,18 @@
+- content_for(:title) { t('.title') }
+
 %h2 #{@conference.name} (#{@form_description.locale})
 
 %p
   = link_to 'Edit', edit_conference_form_description_path(@conference, @form_description), class: 'btn btn-primary'
 
-- %i(head_html plan_help_html booth_help_html policy_help_html ticket_help_html commercial_message_movie_help_html).each do |field|
+- %i(head_html plan_help_html booth_help_html policy_help_html ticket_help_html commercial_message_movie_help_html sponsor_event_help_html event_policy_html).each do |field|
   %div
     %h4 #{field}
     = @form_description[field]&.html_safe
+
+%div
+  %h4 fallback_options
+  - if @form_description.fallback_options.present? && @form_description.fallback_options.any?
+    %pre= JSON.pretty_generate(@form_description.fallback_options)
+  - else
+    %em (not configured)

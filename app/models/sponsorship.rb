@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 class Sponsorship < ApplicationRecord
@@ -8,34 +10,34 @@ class Sponsorship < ApplicationRecord
   belongs_to :plan, optional: true
 
   has_many :contacts, dependent: :destroy
-  has_one :contact, -> { where(kind: :primary) }, class_name: 'Contact'
-  has_one :alternate_billing_contact, -> { where(kind: :billing) }, class_name: 'Contact'
+  has_one :contact, -> { where(kind: :primary) }, class_name: 'Contact', dependent: nil, inverse_of: :sponsorship
+  has_one :alternate_billing_contact, -> { where(kind: :billing) }, class_name: 'Contact', dependent: nil, inverse_of: :sponsorship
 
   has_many :requests, dependent: :destroy, class_name: 'SponsorshipRequest'
-  has_one :billing_request, -> { where(kind: :billing) }, class_name: 'SponsorshipRequest'
-  has_one :customization_request, -> { where(kind: :customization) }, class_name: 'SponsorshipRequest'
-  has_one :note, -> { where(kind: :note) }, class_name: 'SponsorshipRequest'
+  has_one :billing_request, -> { where(kind: :billing) }, class_name: 'SponsorshipRequest', dependent: nil, inverse_of: :sponsorship
+  has_one :customization_request, -> { where(kind: :customization) }, class_name: 'SponsorshipRequest', dependent: nil, inverse_of: :sponsorship
+  has_one :note, -> { where(kind: :note) }, class_name: 'SponsorshipRequest', dependent: nil, inverse_of: :sponsorship
 
   has_one :asset_file, class_name: 'SponsorshipAssetFile', dependent: :destroy
 
-  def asset_file_id; self.asset_file&.id; end
+  has_one :tito_source, dependent: nil
+
+  def asset_file_id; asset_file&.id; end
+
   def asset_file_id=(other)
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
-  # XXX: this can only hold a value, because authorization is mandatory in a controller
-  def asset_file_id_to_copy; @asset_file_id_to_copy; end
-  def asset_file_id_to_copy=(id)
-    raise "asset_file_id_to_copy= cannot be used for a persisted record" if id && self.persisted?
-    @asset_file_id_to_copy = id
-  end
-
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
-  has_one :exhibition
+  has_one :exhibition, dependent: nil
+
+  has_one :expense_report, dependent: :destroy
+  has_many :expense_files, dependent: :destroy
+
+  has_many :sponsor_events, dependent: :destroy
 
   has_many :broadcast_deliveries, dependent: :nullify
-  has_many :tickets, dependent: :destroy
 
   has_many :tito_discount_codes, dependent: :destroy
 
@@ -47,12 +49,21 @@ class Sponsorship < ApplicationRecord
     @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
   end
 
-  scope :active, -> { where(withdrawn_at: nil).where.not(accepted_at: nil) }
+  def tito_booth_paid_discount_code
+    @tito_booth_paid_discount_code ||= tito_discount_codes.where(kind: 'booth_paid').first
+  end
+
+  scope :active, -> { accepted.not_withdrawn }
+  scope :pending, -> { not_accepted.not_withdrawn }
+
   scope :exhibitor, -> { where(booth_assigned: true) }
   scope :plan_determined, -> { where.not(plan_id: nil) }
+
   scope :withdrawn, -> { where.not(withdrawn_at: nil) }
   scope :not_withdrawn, -> { where(withdrawn_at: nil) }
   scope :accepted, -> { where.not(accepted_at: nil) }
+  scope :not_accepted, -> { where(accepted_at: nil) }
+
   scope :have_presence, -> { where(suspended: false).merge(Sponsorship.active).merge(Sponsorship.plan_determined) }
 
   scope :includes_contacts, -> { includes(:contact, :alternate_billing_contact) }
@@ -68,9 +79,7 @@ class Sponsorship < ApplicationRecord
 
   validates :asset_file, presence: true
 
-  validates :ticket_key, presence: true
-
-  validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
+  validates :number_of_additional_attendees, numericality: {allow_nil: true, greater_than_or_equal_to: 0, only_integer: true}
 
   validate :validate_correct_plan
   validate :validate_plan_change, on: :update_by_user
@@ -79,24 +88,24 @@ class Sponsorship < ApplicationRecord
   validate :validate_commercial_message_movie_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
+  validate :validate_fallback_option, on: :update_by_user
   validate :policy_agreement
 
+  accepts_nested_attributes_for :contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
+  accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
 
-  accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }
-  accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: -> (attrs) { attrs['kind'].present? }
-
-  accepts_nested_attributes_for :billing_request, reject_if: -> (attrs) { attrs['kind'].present? }
-  accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
-  accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
+  accepts_nested_attributes_for :billing_request, reject_if: ->(attrs) { attrs['kind'].present? }
+  accepts_nested_attributes_for :customization_request, reject_if: ->(attrs) { attrs['kind'].present? }
+  accepts_nested_attributes_for :note, reject_if: ->(attrs) { attrs['kind'].present? }
 
   before_validation :generate_ticket_key
 
   def build_nested_attributes_associations
-    self.build_contact unless self.contact
-    self.build_alternate_billing_contact unless self.alternate_billing_contact
-    self.build_billing_request unless self.billing_request
-    self.build_customization_request unless self.customization_request
-    self.build_note unless self.note
+    build_contact unless contact
+    build_alternate_billing_contact unless alternate_billing_contact
+    build_billing_request unless billing_request
+    build_customization_request unless customization_request
+    build_note unless note
   end
 
   def active?
@@ -143,7 +152,7 @@ class Sponsorship < ApplicationRecord
   end
 
   def slug
-    self.organization&.slug
+    organization&.slug
   end
 
   def word_count
@@ -152,7 +161,8 @@ class Sponsorship < ApplicationRecord
 
   def policy_agreement
     return @policy_agreement if defined? @policy_agreement
-    @policy_agreement = self.persisted?
+
+    @policy_agreement = persisted?
   end
 
   def policy_agreement=(other)
@@ -163,8 +173,12 @@ class Sponsorship < ApplicationRecord
     alternate_billing_contact || contact
   end
 
-  def assume_organization
-    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2).last)
+  def assume_organization(affiliated_organization: nil)
+    self.organization = if affiliated_organization
+      affiliated_organization
+    else
+      Organization.create_with(name: name).find_or_initialize_by(domain: contact&.email&.split('@', 2)&.last&.downcase)
+    end
   end
 
   def to_h_for_history
@@ -192,12 +206,29 @@ class Sponsorship < ApplicationRecord
       "organization_name" => organization&.name,
       "locale" => locale,
       "asset_file_id" => asset_file&.id,
+      "asset_file.extension" => asset_file&.extension,
+      "asset_file.version_id" => asset_file&.version_id,
+      "asset_file.checksum_sha256" => asset_file&.checksum_sha256,
+      "asset_file.last_modified_at" => asset_file&.last_modified_at,
       "note" => note&.body,
+      "fallback_option" => fallback_option,
       "number_of_additional_attendees" => number_of_additional_attendees,
       "accepted_at" => accepted_at,
     }.tap do |h|
       h["withdrawn_at"] = withdrawn_at if withdrawn_at
     end
+  end
+
+  def attributes_for_copy
+    {
+      name: name,
+      url: url,
+      profile: profile,
+      asset_file_id: asset_file_id,
+      contact_attributes: contact.attributes.except('id', 'kind'),
+      alternate_billing_contact_attributes: alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
+      billing_request_attributes: billing_request&.attributes&.except('id', 'kind'),
+    }.compact
   end
 
   def total_number_of_attendees
@@ -207,14 +238,10 @@ class Sponsorship < ApplicationRecord
       0
     end
   end
-  
-  def total_number_of_booth_staff
-    #(active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
-    (active? && booth_assigned?) ? 3 : 0 # FIXME:
-  end
 
-  def number_of_registered_attendees
-    tickets.where.not(kind: :attendee, checked_in_at: nil).count
+  def total_number_of_booth_staff
+    # (active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
+    active? && booth_assigned? ? 2 : 0 # FIXME: make configurable per conference
   end
 
   def booth_size
@@ -233,37 +260,41 @@ class Sponsorship < ApplicationRecord
     self.withdrawn_at = Time.zone.now
     self.booth_assigned = false
     self.plan = nil
-    return self
+    self
   end
 
-  private
+  def tito_source_code
+    raise "Cannot generate tito source code without id" unless id
 
-  def validate_correct_plan
-    if plan && plan.conference_id != self.conference_id
+    "ss_#{id}"
+  end
+
+  private def validate_correct_plan
+    if plan && plan.conference_id != conference_id
       errors.add :plan, "can't have a plan for an another conference"
     end
   end
 
-  def validate_plan_availability
+  private def validate_plan_availability
     if plan && plan_id_changed? && !plan.available?
       errors.add :plan, :unavailable
     end
   end
 
-  def validate_plan_change
+  private def validate_plan_change
     if plan_id_changed? && plan_id_was && accepted?
       errors.add :plan, :unchangeable_after_finalization
     end
   end
 
-  def validate_policy_agreement
-    if !policy_agreement
+  private def validate_policy_agreement
+    unless policy_agreement
       errors.add :policy_agreement, "must agree with the policy"
     end
   end
 
-  def validate_booth_eligibility
-    if booth_requested && !(plan&.booth_eligible?)
+  private def validate_booth_eligibility
+    if booth_requested && !plan&.booth_eligible?
       errors.add :booth_requested, :not_eligible
     end
   end
@@ -274,24 +305,37 @@ class Sponsorship < ApplicationRecord
     end
   end
 
-  def validate_word_count
+  private def validate_word_count
     limit = plan&.words_limit_hard
     if limit && word_count > limit
-      errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
+      errors.add :profile, :too_long, maximum: plan.words_limit || 0
     end
   end
 
-  def validate_no_plan_allowance
+  private def validate_no_plan_allowance
     if !plan_id && conference && !conference.no_plan_allowed
       errors.add :plan, :no_plan_not_allowed
     end
   end
 
-  def generate_ticket_key
-    if self.ticket_key.blank?
-      begin
+  private def validate_fallback_option
+    form_desc = conference&.form_description_for_locale
+    return unless form_desc
+
+    fallback_options = form_desc.fallback_options
+    if fallback_options.present? && fallback_options.any?
+      if fallback_option.present? && !fallback_options.any? { |opt| opt.value == fallback_option }
+        errors.add :fallback_option, :invalid
+      end
+    end
+  end
+
+  private def generate_ticket_key
+    if ticket_key.blank?
+      loop do
         self.ticket_key = SecureRandom.urlsafe_base64(64)
-      end while self.class.where(conference: conference, ticket_key: self.ticket_key).exists?
+        break unless self.class.where(conference: conference, ticket_key: ticket_key).exists?
+      end
     end
   end
 end

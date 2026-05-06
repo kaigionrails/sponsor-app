@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MakeCommercialMessageMovieAcceptable < ActiveRecord::Migration[6.1]
   def change
     add_column :conferences, :commercial_message_movie_capacity, :integer, default: 0, null: false

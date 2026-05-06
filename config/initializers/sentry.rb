@@ -1,10 +1,10 @@
-# https://docs.sentry.io/platforms/ruby/guides/rails/
-Sentry.init do |config|
-  config.dsn = ENV["SENTRY_DSN"]
-  config.breadcrumbs_logger = [:active_support_logger, :http_logger]
-  config.environment = ENV.fetch("SENTRY_ENV", Rails.env)
+# frozen_string_literal: true
 
-  # To activate performance monitoring, set one of these options.
-  # We recommend adjusting the value in production:
-  config.traces_sample_rate = 0.0
+Sentry.init do |config|
+  config.dsn = ENV['SENTRY_DSN']
+  config.background_worker_threads = 0 if ENV['AWS_LAMBDA_FUNCTION_NAME']
+
+  config.traces_sample_rate = 0.25
+  config.enable_logs = true
+  config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 end

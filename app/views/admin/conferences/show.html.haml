@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title', conference: @conference.name) }
+
 %p
   - application_form_url = new_user_conference_sponsorship_url(@conference, {invite_code: @conference.invite_code}.compact)
 
@@ -49,6 +51,7 @@
             %li
               = link_to plan.name, edit_conference_plan_path(@conference, plan)
               %span (#{count}/#{capacity})
+        = link_to 'View all plans', conference_plans_path(@conference), class: 'card-link'
         = link_to 'Add plan', new_conference_plan_path(@conference), class: 'card-link'
 
   .col-md-4
@@ -61,7 +64,8 @@
           %li= link_to "Broadcasts", conference_broadcasts_path(@conference)
           %li= link_to "Check Attendees", attendees_keeper_conference_path(@conference)
           %li= link_to "Booth Assignment", conference_booth_assignment_path(@conference)
-          %li= link_to "Reception", reception_conference_path(@conference)
+          %li= link_to "Events", conference_sponsor_events_path(@conference)
+          %li= link_to "Expense Reports", conference_expense_reports_path(@conference)
 
 .row
   .col-md-12

@@ -1,18 +1,29 @@
-class Admin::DashboardController < Admin::ApplicationController
-  def index
-    redirect_to conferences_path
-  end
+# frozen_string_literal: true
 
-  def slacktown
-    SlackWebhookJob.perform_later(
-      text: "This is SlackWebhookJob Test Notification invoked by #{current_staff&.login}",
-    )
-    render plain: "Slack Slack Slack"
-  end
+module Admin
+  class DashboardController < Admin::ApplicationController
+    class Boom < StandardError; end
 
-  def mailtown
-    AdminTestMailer.with(to: params[:to]).notify.deliver_later
-    render plain: "Mail Mail Mail"
-  end
+    def index
+      redirect_to conferences_path
+    end
 
+    def slacktown
+      SlackWebhookJob.perform_later(
+        text: "This is SlackWebhookJob Test Notification invoked by #{current_staff&.login}",
+      )
+      render plain: "Slack Slack Slack"
+    end
+
+    def mailtown
+      AdminTestMailer.with(to: params[:to]).notify.deliver_later
+      render plain: "Mail Mail Mail"
+    end
+
+    def errortown
+      request_id = request.request_id
+      ErrorTownJob.perform_later(request_id)
+      raise Boom, "boom! #{request_id}"
+    end
+  end
 end

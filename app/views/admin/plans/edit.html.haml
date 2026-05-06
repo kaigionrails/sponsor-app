@@ -2,6 +2,8 @@
   %ol.breadcrumb
     %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
 
+- content_for(:title) { t('.title') }
+
 %h1 Editing Plan (#{@conference.name})
 
 = render 'form', plan: @plan

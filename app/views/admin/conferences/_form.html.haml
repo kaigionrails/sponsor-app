@@ -20,25 +20,62 @@
     %small.form-text
       %code owner/repo[@branch]:path/to/file
   .form-group
+    = form.label :github_repo_images_path
+    = form.text_field :github_repo_images_path, class: 'form-control'
+    %small.form-text
+      Path prefix for event asset images within the GitHub repo, without trailing slash (e.g.
+      %code images
+      )
+  .form-group
     = form.label :tito_slug
     = form.text_field :tito_slug, class: 'form-control'
     %small.form-text
       %code account_slug/event_slug
   .form-group
+    = form.label :tito_booth_paid_flat_discount_amount
+    = form.number_field :tito_booth_paid_flat_discount_amount, class: 'form-control', step: '0.01'
+  .form-group
     = form.label :application_opens_at
-    = form.datetime_local_field :application_opens_at, class: 'form-control'
+    .input-group
+      = form.datetime_local_field :application_opens_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_application_opens_at', command: '--set-now'} Now
   .form-group
     = form.label :application_closes_at
-    = form.datetime_local_field :application_closes_at, class: 'form-control'
+    .input-group
+      = form.datetime_local_field :application_closes_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_application_closes_at', command: '--set-now'} Now
   .form-group
     = form.label :amendment_closes_at
-    = form.datetime_local_field :amendment_closes_at, class: 'form-control'
+    .input-group
+      = form.datetime_local_field :amendment_closes_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_amendment_closes_at', command: '--set-now'} Now
+  .form-group
+    = form.label :event_submission_starts_at
+    .input-group
+      = form.datetime_local_field :event_submission_starts_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_event_submission_starts_at', command: '--set-now'} Now
   .form-group
     = form.label :ticket_distribution_starts_at
-    = form.datetime_local_field :ticket_distribution_starts_at, class: 'form-control'
+    .input-group
+      = form.datetime_local_field :ticket_distribution_starts_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_ticket_distribution_starts_at', command: '--set-now'} Now
+  .form-group
+    = form.label :pass_retraction_disables_at
+    .input-group
+      = form.datetime_local_field :pass_retraction_disables_at, class: 'form-control', step: 1
+      .input-group-append
+        %button.btn.btn-outline-secondary{type: 'button', commandfor: 'conference_pass_retraction_disables_at', command: '--set-now'} Now
   .form-group
     = form.label :booth_capacity
     = form.number_field :booth_capacity, class: 'form-control'
+    %small.form-text
+      %code must be 1+ to activate booth request form
+
   .form-group
     = form.label :commercial_message_movie_capacity
     = form.number_field :commercial_message_movie_capacity, class: 'form-control'

@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title', broadcast: @broadcast.campaign) }
+
 %nav{aria: {label: 'breadcrumb'}}
   %ol.breadcrumb
     %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
@@ -38,7 +40,7 @@
         %th{scope: :col}
         %th{scope: :col}
     %tbody
-      - @broadcast.deliveries.includes(sponsorship: :conference).each do |delivery|
+      - @broadcast.deliveries.includes(sponsorship: :conference).left_joins(:sponsorship).order("sponsorships.name ASC, recipient ASC").each do |delivery|
         %tr
           - if delivery.sponsorship
             %td= link_to delivery.sponsorship.name, conference_sponsorship_path(delivery.sponsorship.conference, delivery.sponsorship)

@@ -8,6 +8,7 @@ ja:
         profile: '紹介文'
         booth_requested: 'ブース出展'
         commercial_message_movie_requested: 'CM映像放送'
+        fallback_option: '優先順位'
         number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
 
@@ -26,13 +27,36 @@ ja:
         unit: '部署等'
         name: '名前'
 
+      conference:
+        pass_retraction_disables_at: 'チケット/パスキャンセル無効化日時'
+
+      form_description:
+        fallback_options: 'Fallback Options'
+
       exhibition:
         description: 'ブース詳細'
 
-      ticket:
-        name: '名前'
-        kind: 'チケット種別'
-        email: 'メールアドレス'
+      sponsor_event:
+        title: 'イベント名'
+        starts_at: '開始日時'
+        url: 'イベントURL'
+        price: '参加費'
+        capacity: '定員'
+        location_en: '開催場所 (英語)'
+        location_local: '開催場所 (日本語)'
+        slug: 'Slug'
+        status: 'ステータス'
+        link_name: 'ボタンテキスト'
+        admin_comment: '管理者コメント'
+        policy_acknowledged_at: 'ポリシー同意日時'
+        policy_agreement: '上記ポリシーに同意する'
+
+      expense_report/status:
+        draft: '下書き'
+        submitted: '提出済み'
+        approved: '承認済み'
+        rejected: '差し戻し'
+
     errors:
       models:
         sponsorship:
@@ -42,7 +66,7 @@ ja:
               unchangeable_after_finalization: "はスポンサーシップ確定後の変更は原則として受け付けていません"
               no_plan_not_allowed: "を選択してください (その他を選ぶことはできません)"
             organization:
-              taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
+              taken: "同じ組織から既にスポンサーシップの申込があります (メールアドレスのドメインで判定しています)。別のメールアドレスを使用するか、複数のスポンサーシップを希望する場合はお問い合わせください。"
             booth_requested:
               not_eligible: "は選択されたスポンサープランでは対象外です"
             commercial_message_movie_requested:
@@ -51,6 +75,7 @@ ja:
               too_long: "が長過ぎます。選択されたプランでは %{maximum} 文字程度が上限となっています。"
 
   helpers:
+    download_previously_uploaded: '(以前にアップロードしたファイルをダウンロードする)'
     label:
       'sponsorship[billing_request_attributes]': *billing_request
       'sponsorship[customization_request_attributes]': *customization_request
@@ -58,9 +83,6 @@ ja:
       sponsorship:
         booth_requested: 'ブース出展する'
         commercial_message_movie_requested: 'CM映像を掲載する'
-    submit:
-      ticket:
-        create: '登録'
 
   layouts:
     application:
@@ -70,13 +92,28 @@ ja:
       login: 'ログイン'
       logout: 'ログアウト'
 
+  root:
+    index:
+      become_a_sponsor: "新規スポンサー申し込み"
+      sponsor_conference: "%{conference} をスポンサーする"
+      already_a_sponsor: "すでにスポンサーの場合"
+      login: "ログイン"
+      no_open_applications: "現在 %{org_name} はスポンサー申し込みは受け付けておりません。受付期間を過ぎているか、まだ受付がはじまっていません。"
+      choose_conference: "カンファレンスを選択してください"
+
+  conferences:
+    index:
+      title: イベント一覧
+
   sessions:
     new:
+      title: ログイン
       header: Log in
       description: "スポンサーシップ申し込みで利用したメールアドレスを入力してください。"
       email_address: "Eメールアドレス"
       submit: "進む"
     claim:
+      title: ログイン
       expired: "リンクの有効期限が切れています。ログインページにてリンクを再取得してください。"
     create:
       no_email_found: "入力されたEメールアドレスが確認できませんでした。再度入力していただくか、お問い合わせください。"
@@ -91,25 +128,27 @@ ja:
     user_email:
       subject: "スポンサーシップ申込確認"
     admin_email:
-      subject: "New sponsorship application from: %{name}"
-  ticket_retrieval_mailer:
-    notify:
-      subject: 'スポンサーチケット URL のお知らせ'
-  unauthorized_ticket_warning_mailer:
-    notify:
-      subject: 'スポンサーチケット忘れの参加者を受付しました'
-
+      subject: "New: %{name}"
 
   sponsorships:
+    new:
+      title: スポンサー申込
+    edit:
+      title: 申込内容の編集
     form:
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
+      affiliated_organization_notice: 'このスポンサー申込は %{organization} に紐付けられます。'
       copy:
         header: '過去の申込情報を利用する'
         explanation: '過去の申込情報を利用することができます。下記より既存のスポンサーシップ申込を選択してください。'
+        login_required: '過去の申込情報を利用するにはログインが必要です。'
       contact: '連絡先'
+      email_help: "主のメールアドレスにはメーリングリストの利用を推奨します。その場合, 担当者のアドレスは CC に指定ください。次回開催時など継続しての申込の際、過去の情報を参照しやすくなります。"
       email_cc_help: '上記の E メールアドレスの他に、各種連絡において送信先として加えるアドレス (CC) を入力してください。複数のアドレスをカンマ (,) 区切りで入力できます。尚、CC 先のアドレスではスポンサーポータルへの新規ログインはできません。'
       billing: '請求情報'
+      # Please provide billing information for invoicing. If you have any special requests, use the additional note field below. Note that we will issue invoices in PDF format via email; No hardcopy will be sent.'
+      billing_help: "請求書発行のための請求情報をご提供ください。なお、請求書は PDF 形式でメールにて送信し、郵送は行いません。また、いただいた連絡事項が対応可能な場合、こちらから了承のお返事は差し上げませんのでご了承ください。"
       specify_alternate_billing_contact: '請求に関して別の連絡・送付先を指定する'
       billing_request_help: '請求に関しての要求、特に特別な契約や申込書のやり取りが必要、請求期日に関するご要望がある場合などがあれば、その旨ご記入ください。'
       plan: 'スポンサープラン'
@@ -137,9 +176,19 @@ ja:
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
       commercial_message_movie: 'CM映像放映'
       commercial_message_movie_uneligible_plan_selected: '選択されたプランではCM映像放映はできません (%{plans} プランのみが対象となります)'
+      fallback_option: '代替の希望プランを設定する'
+      fallback_option_blank: '-- 選択してください --'
+      fallback_option_help: '選択したプランは抽選などにより希望に沿えない可能性がございます。その場合に備え、代替のプランを選択してください。'
+      fallback_priority:
+        header: '希望順'
+        help: 'このオプションは、第一希望を含め、以下の順番が希望順として設定されます。[ブースあり] と表記されている順位については、ブース希望ではなくブース割り当てがある場合を意味します。'
+      fallback_option_priority:
+        withdraw: 'ご辞退'
+        no_booth: 'ブースなし'
+        booth: 'ブースあり'
       information: 'サイト掲載情報'
       information_help: |
-        ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。
+        ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。こちらの情報は全て英語での提出をお願いしております。情報に含まれる社名・サービス名についても、英語表記をご利用ください。また、仮の内容を提出される場合はその旨を下記 [その他の連絡事項] 欄にご記入ください。修正され、連絡事項で仮ではなくなった事が分かるまで Web サイトへの掲載を保留いたします。
       logo: 'ロゴ'
       download_logo: '(以前にアップロードしたファイルをダウンロードする)'
       logo_help_html: |
@@ -155,13 +204,29 @@ ja:
       note: 'その他の連絡事項'
       policies: 'ポリシー'
       submit: '送信'
+      warnings:
+        english:
+          header: 'サイト掲載情報に英語以外が含まれている可能性があります'
+          body1: 'サイト掲載情報はすべて英語での提出をお願いしております。サービス名や会社名についても英語表記での記載をお願いいたします。本警告が誤検知と思われる場合、もしくは事情がありこの内容での提出を希望される場合、下記の確認欄にチェックを入れ、[その他の連絡事項] にてご説明ください。'
+          body2: 'なお、ご提出後、人間による確認の上でも問題があると判断された場合、あらためて修正をお願いし、修正されるまでは Web サイト等への掲載が保留される可能性がありますのでご了承ください。'
+          acknowledge: '上記の内容は英語のみで構成されているか、事情があるためこの内容での提出を希望します。'
+        zip_asset:
+          header: '.zip ファイルの要件を確認してください'
+          item0: '.zip ファイルは暗号化されていないこと'
+          item1: '.zip ファイルにはベクター形式ファイル (.ai, .svg, .pdf) が含まれていること'
+          item2: '.zip ファイルには必要なガイドラインファイルなど含まれていること (該当する場合)'
+          item3: '複数のロゴが含まれる場合: 次の [その他の連絡事項] 欄でファイル名を指定してください'
+          acknowledge: '上記の要件を確認しました。'
+
     closed:
+      title: 受付終了
       header: '申し込み期間ではありません'
       closed: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへのスポンサー申し込みは %{ts} に締め切られました。"
       not_yet_open: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへの申し込みはまだ開始しておりません。"
     create:
       notice: "スポンサーシップへお申込みいただきありがとうございます。入力いただいたメールアドレスへ確認メールを送信しました。"
     show:
+      title: スポンサーポータル
       header: "%{name} スポンサーポータル"
       your_application: "申込情報"
       edit: "修正"
@@ -171,8 +236,6 @@ ja:
       your_sponsorship_plan: "スポンサープラン"
       customized_plan: "カスタム"
       sponsor_talk_eligible: "スポンサーセッション有り"
-      included_guests: "プランに含まれているチケット"
-      additional_guests: "追加でお取り置きしているチケット"
       guests_count:
         zero: '0 枚'
         one: '1 枚'
@@ -196,18 +259,131 @@ ja:
         edit: '修正'
         new: '申請する'
         not_submitted: '未提出'
+      events:
+        title: 'スポンサー開催イベント'
+        no_events: 'まだイベントは登録されていません。'
+        submit_new: '新しいイベントを登録'
+        status_pending: '確認待ち'
+        status_accepted: '承認済'
+        status_rejected: '却下'
+        status_withdrawn: '取り下げ済'
       tickets:
         title: 'スポンサーチケット'
-        your_url: 'チケット取得URL'
-        attendee_url: '招待 URL'
-        booth_staff_url: 'ブーススタッフ招待 URL'
+        attendee_url: '本編チケット'
+        booth_staff_url: 'ブースパス - 無償'
+        booth_paid_url: 'ブースパス - 有償'
+        quantity:
+          one: '%{count} 枚'
+          other: '%{count} 枚'
         help:
-          direction: '受付のために、上記 URL の指示に従ってください。'
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
+        view_redemptions: '利用状況を確認する'
+      expense_report:
+        title: 'カスタムスポンサー向け経費報告'
+        create: '経費報告を作成する'
+        view: '経費報告を表示・編集する'
+        fee: '協賛費'
+        total_expense: '経費合計'
+        remaining: '残額'
+      broadcasts:
+        title: 'メール配信履歴'
+        description: 'その他、メールにて配信された過去のアナウンスを確認できます。'
+        view_all: '全てのメールを見る'
+      announcements: 'お知らせ'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
+  expense_reports:
+    show:
+      title: 経費報告
+      header: "%{name} 経費報告"
+      editor:
+        loading: "経費報告を読み込んでいます..."
+        confirm_discard: "未保存の変更があります。破棄しますか？"
+        error_load: "報告の読み込みに失敗しました"
+        fee: "スポンサー費:"
+        expense: "経費:"
+        plus_tax: "+ 税"
+        remaining: "残額:"
+        submit: "審査へ提出"
+        submitting: "提出中..."
+        error_submit: "提出に失敗しました"
+        withdraw: "提出を取り下げる"
+        withdrawing: "取り下げ中..."
+        confirm_withdraw: "提出を取り下げますか？ あとで再提出できます。"
+        error_withdraw: "取り下げに失敗しました"
+        review_feedback: "レビューコメント:"
+        back: "戻る"
+        line_items: "明細リスト"
+        add_line_item: "明細を追加"
+        no_line_items: "明細がありません"
+        files: "その他のファイル"
+        drop_to_add: "ファイルをドロップするか %{link} して追加"
+        upload: "アップロード"
+        drop_unlinked: "新規ファイルとして追加"
+        select_line_item: "明細を選択してください"
+        create_from_file: "このファイルから明細を作成"
+        creating: "作成中..."
+        delete_file: "このファイルを削除"
+        confirm_delete_file: "このファイルを削除しますか？"
+        preview_file: "プレビュー"
+        title_label: "摘要"
+        notes_label: "備考"
+        notes_placeholder: "(任意)"
+        tax_mode_label: "税の入力方法"
+        tax_mode_exclude: "税抜を入力する"
+        tax_mode_include: "税込を入力する"
+        tax_mode_exempt: "課税対象外"
+        tax_mode_manual: "税抜額と税額を手動で入力する"
+        tax_rate_label: "税率"
+        amount_excl: "金額 (税抜)"
+        amount_incl: "金額 (税込)"
+        tax_amount_label: "税額"
+        preliminal_label: "概算 (予算計画/未確定の場合)"
+        attached_files: "添付ファイル"
+        no_files_attached: "ファイルなし"
+        drop_or_upload: "ファイルをドロップするか %{link} して添付"
+        or_separator: "— または —"
+        link_existing: "アップロード済みファイルを追加..."
+        save: "保存"
+        saving: "保存中..."
+        error_save: "保存に失敗しました"
+        add_same_files: "同じファイルからさらに明細を追加"
+        adding: "追加中..."
+        error_add: "追加に失敗しました"
+        delete: "削除"
+        deleting: "削除中..."
+        confirm_delete_item: "この明細を削除しますか？"
+        error_delete: "削除に失敗しました"
+        error_create: "作成に失敗しました"
+        drop_link_to: "明細「%{title}」へアップロード"
+        drop_create_item: "新しい明細を作成してアップロード"
+        select_file: "ファイルを選択するとプレビューできます"
+        no_preview: "プレビューできません"
+        download: "ダウンロード"
+        preliminal_badge: "概算"
+        no_file_badge: "ファイルなし"
+        no_file_alert: "ファイルが添付されていない明細があります。添付は必須ではありませんが、可能な場合は領収書や請求書を添付してください。"
+        link_to_existing_items: "既存の明細に添付"
+        link_selected: "選択した明細に添付"
+        uploading: "アップロード中"
+        upload_failed: "アップロード失敗"
+        retry: "再試行"
+        discard: "破棄"
+        error_unsupported_file: "対応していないファイル形式です: %{names}"
+        review_dialog_title: "提出内容の確認"
+        review_dialog_no_files: "ファイルなし"
+        review_dialog_unlinked_files: "その他のファイル"
+        review_dialog_base_fee: "協賛費"
+        review_dialog_total_expense: "経費合計 (税抜)"
+        review_dialog_remaining: "残額 (請求される金額)"
+        review_dialog_overage_warning: "スポンサー費を超過した金額についての払い戻しはありません。"
+        review_dialog_cancel: "キャンセル"
   exhibitions:
+    new:
+      title: ブース詳細
+    edit:
+      title: ブース詳細の編集
     create:
       notice: 'ブース詳細の提出を受け付けました。'
     update:
@@ -216,27 +392,133 @@ ja:
       header: 'ブース詳細'
       help: 'ブース出展内容を記載してください。イベントに沿った内容か、また、アンチハラスメントポリシーに抵触しないか確認いたします。追加で確認が必要な場合、イベント運営者からご連絡いたします。'
       submit: '送信'
-  tickets:
+
+  sponsor_events:
+    event_submission_not_open: 'イベント登録はまだ開始されていません。'
+    sponsorship_not_accepted: 'イベントを登録するには、スポンサーシップが承認されている必要があります。'
     new:
-      header: '%{name} スポンサーチケット登録'
-      desc1: "このページで %{conference} のスポンサーチケットを取得できます。"
-      onsite:
-        head: 'スマートフォンを利用して登録する:'
-        desc: "このページをスマートフォンで表示して登録を行い、表示された QR コードを受付へ提示してください。登録は直前でも大丈夫です。"
-      print_in_advance:
-        head: '事前に印刷する:'
-        desc: "もしくは今登録の上、表示された QR コードを印刷してそれを受付に提示することも可能です。"
-      desc2: "スマートフォンでの登録を推奨します。"
-      code_desc: "上記コードでこのページを開くことができます"
-      form:
-        from: '(%{sponsorship})'
-        email_help: '任意(推奨)。記入されたメールアドレスへチケットのリンクが送信されます。'
-        attendee_help: "一般参加者のチケットです。通常はこれを選択してください。"
-        booth_staff_help: "スポンサーブース用のブースパスです。ブースパスではセッション聴講をすることはできません。"
-        policy_help: "下記「登録」ボタンをもって下記ポリシーへ同意したものとみなします。"
-        submit_help: "このフォームを送信した時点ではスポンサーチケットの利用とはなりません。会場での受付をもってスポンサーチケットを利用したものとみなされます。"
+      title: イベント登録
+      header: イベント登録
+    edit:
+      title: イベント編集
+      header: イベント編集
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。変更が必要な場合は、スポンサー窓口までご連絡ください。'
     show:
-      guide1: "本ページを受付へ提示してください。スマートフォンで表示することを推奨しますが、このページを印刷したものを提示することもできます。"
-      guide2: "このチケットを再表示するためのリンクは記入されたメールアドレスへ送信されています。"
-      reissue_guide: "複数登録する場合、また記入ミスがあった場合のチケットの再登録は"
-      reissue_link: "こちらから可能です。"
+      title: イベント詳細
+      event_details: イベント詳細
+      actions: 操作
+      edit: 編集
+      withdraw: 取り下げ
+      withdraw_confirm: 'このイベントを取り下げますか？この操作はご自身では元に戻せません。'
+      back_to_sponsorship: 'スポンサーポータルに戻る'
+    create:
+      notice: 'イベントが登録されました。'
+    update:
+      notice: 'イベントが更新されました。'
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。'
+    destroy:
+      notice: 'イベントを取り下げました。'
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。'
+    form:
+      asset_file: '画像'
+      asset_file_help: '公開イベント一覧に表示するヘッダー/バナー/OGP画像 (オプション)。対応フォーマット: PNG, JPEG, WebP (最大20MB)'
+      starts_at_help: '開場・受付開始時刻ではなく、イベント自体の開始時刻を入力してください。'
+      url_help: 'イベントの詳細や登録ページのURLを入力してください。'
+      location_local_help: '開催場所は日本語での名称も必須としています。参加者が会場を見つけやすくするためです。'
+      capacity_placeholder: '例: 100'
+      price_placeholder: '例: Free, 1000 JPY'
+      submit: 送信
+
+  views:
+    sponsor_events:
+      warnings:
+        english:
+          header: 'イベント情報に英語以外の文字が含まれている可能性があります'
+          body1: 'イベント情報は「開催場所 (日本語)」を除き、すべて英語での入力をお願いしております。英語のみで構成されていることをご確認いただくか、誤検知と思われる場合は下記のチェックボックスをご利用ください。'
+          body2: '提出後の確認で英語以外の文字が見つかった場合、公開前に修正をお願いする可能性があります。'
+          acknowledge: '上記の入力は英語のみで構成されています。'
+
+  broadcasts:
+    index:
+      title: 'メール配信履歴'
+      header: '%{name} - メール配信履歴'
+      empty: 'まだメールは配信されていません。'
+      notice:
+        email_announcements: 'このページは過去にメールで配信されたアナウンスを表示しています。'
+        not_individual_emails_html: '%{contact_email} 等との個別のメールでのやり取りや記録は含まれていません。'
+        sponsorship_portal: 'スポンサーポータル'
+        announcements_updated_html: '%{link}のお知らせ一覧はメール配信と平行して、最新の情報を反映するよう更新しています。本ページを参照する際は、過去のメールには古くなった内容を含む可能性があるためご注意ください。'
+
+  pass_redemptions:
+    index:
+      title: 招待/パス利用状況
+      header: '招待/ブースパス利用状況'
+      card_title: '利用状況'
+      no_registrations: '招待URLを利用した登録はまだありません。'
+      invitation:
+        title: '招待URL'
+        attendee_url: '本編チケット'
+        booth_staff_url: 'ブースパス(無償)'
+        booth_paid_url: 'ブースパス(有償)'
+        quantity:
+          one: '%{count} 枚'
+          other: '%{count} 枚'
+      table:
+        retract: '取消'
+        registration_reference: '登録番号'
+        ticket_reference: 'チケット番号'
+        release: 'リリース'
+        registration_email: '登録者'
+        ticket_email: '割当先'
+        ticket_state: 'ステータス'
+      state:
+        unassigned: '未割当'
+        complete: '完了'
+        incomplete: '未完了'
+        void: '無効'
+      release_type:
+        sponsor: '本編チケット'
+        exhibitor: 'ブースパス'
+        'exhibitor-paid': '有償ブースパス'
+      notes:
+        overview: 'このページでは招待URLを利用して登録されたチケットやブースパスの状況を確認することができます。'
+        incomplete_status: '[未完了] となっているチケットは必要な質問事項への回答が終わっておらず、受付用QRコードが表示されていないチケットです。会場到着までに回答を完了するよう、チケット割り当て先へご案内ください。'
+        registration_vs_ticket: 'チケット管理システム Tito は一度の登録 (購入) で複数のチケットを取得できます。また、それを登録者が一括して管理することができるようになっています。このページでは登録(購入)された単位を [登録]、それに紐つくチケットは [チケット] と表記しています。招待URLを利用しての登録は、URLを直接案内し複数に分けても構いませんし、担当者が一度にまとめて登録しチケットを Tito から参加者へ割り振ることもできます。'
+        email_management: 'なお、Tito からのメールは @tito.io のメールアドレスから送信されます。登録に紐づく全てのチケットを管理するには ''Your %{conference_name} Confirmation'' という件名のメールをご確認ください。チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され、こちらは割り当てられたチケットのみを管理できるようになっています。'
+        reassignment: 'チケットの再割り当ては上記のメールから行うことができます。セキュリティ上の理由から、メールアドレスを誤登録した場合はチケットを無効化して再登録することをおすすめします。'
+        retraction_enabled: 'また、本ページでは登録のキャンセルができます。[取消] ボタンから手続きを行うと登録とそのチケットを無効にする代わりに、招待URLの利用回数を復旧できます。一部 [取消] ボタンが表示されない登録がありますが、その場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までキャンセルしたいチケットと事情をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
+        retraction_disabled: 'カンファレンスが近いため、自動での取消機能を閉鎖しています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> まで理由とチケット情報をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
+
+  pass_retractions:
+    new:
+      title: 取消申請
+      header: '取消申請'
+      description: '登録 %{reference} のキャンセル申請'
+      disabled_message: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
+      affected_tickets: 'キャンセル対象のチケット'
+      reason_label: 'キャンセル理由'
+      reason_placeholder: 'キャンセルの理由を入力してください (簡潔で構いません/メールアドレス誤登録など)'
+      not_retractable: 'この登録は自動でのキャンセルができませんでした。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
+      notes_header: '注意事項'
+      note_1: '上記のチケット全てが無効になります。一部のチケットのみの無効化はできません (登録単位での取消を行います)。'
+      note_2: 'チケットの割り当てを変更したい場合、チケット管理システム Tito (...@tito.io) から送信されるメールでの手続きがおすすめです。登録者には ''Your %{conference_name} Confirmation'' という件名のメールが、チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信されているはずです。メールアドレス誤登録の場合は取消をおすすめします。'
+      note_3: '無効にした分だけ招待URLの利用回数が復旧します。チケット割当先および登録者への通知は送信されません。無効した旨や、(必要なら)新しいチケットの取得方法をご自身でご連絡ください'
+      confirmation_label: '上記の内容を理解し確認しました。'
+      submit: '申請する'
+      cancel: '利用状況へ戻る'
+    create:
+      notice: 'キャンセル申請を受け付けました。'
+      error: 'キャンセル申請を受け付けできませんでした。'
+    show:
+      title: 取消申請
+      header: '取消申請'
+      completed_header: 'キャンセル完了'
+      completed_message: ''
+      completed_note_1: '招待URLが無効化されたチケットの数だけ再度利用可能になりました'
+      completed_note_2: 'この登録に紐づく全てのチケットが無効化されました'
+      pending_header: 'キャンセル処理中'
+      pending_message: 'キャンセル申請を処理しています。しばらくお待ちください。'
+      note_3: 'チケット割当先、登録者へのキャンセル通知は送信されません。キャンセルした旨や、(必要なら)新しいチケットの取得方法をご自身でご連絡ください。'
+      reason: '理由'
+      registration_reference: '登録'
+      back: '利用状況へ戻る'
