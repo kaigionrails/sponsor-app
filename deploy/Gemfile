@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'hako'
+gem 'rexml'
+gem 'openssl'
+
+gem 'aws-sdk-lambda'

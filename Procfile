@@ -1,3 +1,2 @@
-release: bundle exec rake db:migrate
-web: bundle exec puma -p $PORT -C config/puma.rb
-worker: bundle exec sidekiq -t 30 -c 4 -q default -q mailers
+web: portless sponsor-app bash -c 'bin/rails s --port $PORT'
+vite: bin/vite dev

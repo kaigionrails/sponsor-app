@@ -1,19 +1,24 @@
 = form_with(model: form_description, url: [@conference, form_description], local: true) do |form|
   - if form_description.errors.any?
     .alert.alert-danger
-      %p #{pluralize(conference.errors.count, "error")} prohibited this from being saved:
+      %p #{pluralize(form_description.errors.count, "error")} prohibited this from being saved:
       %ul
-        - conference.errors.full_messages.each do |message|
+        - form_description.errors.full_messages.each do |message|
           %li= message
 
   .form-group
     = form.label :locale
     = form.text_field :locale, class: 'form-control'
 
-  - %i(head plan_help booth_help policy_help ticket_help commercial_message_movie_help).each do |field|
+  - %i(head plan_help booth_help policy_help ticket_help sponsor_event_help event_policy).each do |field|
     .form-group
       = form.label field
       = form.text_area field, class: 'form-control'
+
+  .form-group
+    = form.label :fallback_options
+    = form.text_area :fallback_options, class: 'form-control', value: JSON.pretty_generate(form_description.fallback_options.map(&:as_json)), rows: 10
+    %small.form-text JSON format: [{"value": "key1", "name": "Display Value 1"}, {"value": "key2", "name": "Display Value 2"}]
 
   .form-group
     = form.submit class: 'btn btn-primary'

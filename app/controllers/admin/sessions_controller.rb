@@ -1,10 +1,25 @@
-class Admin::SessionsController < ::ApplicationController
-  layout 'admin'
+# frozen_string_literal: true
 
-  def new
-    if Rails.env.development? && params[:login] # backdoor
-      if ENV['BACKDOOR_SECRET'] && !Rack::Utils.secure_compare(params[:backdoor], ENV['BACKDOOR_SECRET'])
-        return render(status: 401, plain: 'BACKDOOR_SECRET?')
+module Admin
+  class SessionsController < ::ApplicationController
+    layout 'admin'
+
+    def new
+      if params[:proceed]
+        session.delete(:back_to)
+        if params[:back_to]
+          uri = Addressable::URI.parse(params[:back_to])
+          if uri && uri.host.nil? && uri.scheme.nil? && uri.path.start_with?('/')
+            session[:back_to] = params[:back_to]
+          end
+        end
+        redirect_to '/auth/github'
+      end
+    end
+
+    def backdoor
+      unless Rails.env.development?
+        return render(status: :not_found, plain: 'Not Found')
       end
 
       staff = Staff.create_with(
@@ -18,71 +33,58 @@ class Admin::SessionsController < ::ApplicationController
       redirect_to '/'
     end
 
-    if params[:proceed]
-      session.delete(:back_to)
-      if params[:back_to]
-        uri = Addressable::URI.parse(params[:back_to])
-        if uri && uri.host.nil? && uri.scheme.nil? && uri.path.start_with?('/')
-          session[:back_to] = params[:back_to]
+    def create
+      auth = request.env['omniauth.auth']
+      case auth[:provider]
+      when 'github'
+        token = auth.fetch('credentials').fetch('token')
+        all_privileges = staff_member?(token)
+        restricted_privileges = nil
+        unless all_privileges
+          restricted_privileges = github_find_accessible_repos(token, Conference.where(allow_restricted_access: true).map(&:github_repo).compact.map(&:name).uniq)
+          if restricted_privileges.empty?
+            return render(status: :forbidden, plain: "Forbidden (You have to be in any of these repo: #{Rails.application.config.x.github.repo}")
+          end
         end
-      end
-      redirect_to '/auth/github'
-    end
-  end
 
-  def create
-    auth = request.env['omniauth.auth']
-    case auth[:provider]
-    when 'github'
-      token = auth.fetch('credentials').fetch('token')
-      all_privileges = staff_member?(token)
-      restricted_privileges = nil
-      unless all_privileges
-        restricted_privileges = github_find_accessible_repos(token, Conference.where(allow_restricted_access: true).map(&:github_repo).compact.map(&:name).uniq)
-        if restricted_privileges.empty?
-          return render(status: 403, plain: "Forbidden (You have to be in any of these repo: #{Rails.application.config.x.github.repo}")
-        end
+        staff = Staff.find_or_initialize_by(
+          uid: auth.fetch('uid'),
+        )
+        staff.update!(
+          name: auth.fetch('info').fetch('name') || auth.fetch('info').fetch('nickname'),
+          avatar_url: auth.fetch('info').fetch('image'),
+          login: auth.fetch('info').fetch('nickname'),
+          restricted_repos: restricted_privileges,
+        )
+      else
+        render status: :not_found, plain: "Unsupported provider: #{auth[:provider]}"
       end
 
-      staff = Staff.find_or_initialize_by(
-        uid: auth.fetch('uid'),
-      )
-      staff.update!(
-        name: auth.fetch('info').fetch('name') || auth.fetch('info').fetch('nickname'),
-        avatar_url: auth.fetch('info').fetch('image'),
-        login: auth.fetch('info').fetch('nickname'),
-        restricted_repos: restricted_privileges,
-      )
-    else
-      render status: 404, plain: "Unsupported provider: #{auth[:provider]}"
+      session[:staff_id] = staff.id
+      redirect_to(session.delete(:back_to) || '/')
     end
 
-    session[:staff_id] = staff.id
-    return redirect_to(session.delete(:back_to) || '/')
-  end
+    def destroy
+      session.delete(:staff_id)
+      redirect_to '/'
+    end
 
-  def destroy
-    session.delete(:staff_id)
-    redirect_to '/'
-  end
+    private def staff_member?(access_token)
+      octo = Octokit::Client.new(
+        access_token: access_token,
+      )
 
-  private
+      octo.repository?(Rails.application.config.x.github.repo)
+    end
 
-  def staff_member?(access_token)
-    octo = Octokit::Client.new(
-      access_token: access_token,
-    )
+    private def github_find_accessible_repos(access_token, repos)
+      octo = Octokit::Client.new(
+        access_token: access_token,
+      )
 
-    octo.repository?(Rails.application.config.x.github.repo)
-  end
-
-  def github_find_accessible_repos(access_token, repos)
-    octo = Octokit::Client.new(
-      access_token: access_token,
-    )
-
-    repos.select do |repo|
-      octo.repository?(repo)
+      repos.select do |repo|
+        octo.repository?(repo)
+      end
     end
   end
 end

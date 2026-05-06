@@ -7,6 +7,7 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
+        fallback_option: 'Alternative Plan Preference'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
 
@@ -25,13 +26,36 @@ en:
         unit: 'Unit'
         name: 'Name'
 
+      conference:
+        pass_retraction_disables_at: 'Pass Retraction Disables At'
+
+      form_description:
+        fallback_options: 'Fallback Options'
+
       exhibition:
         description: 'Booth Plan'
 
-      ticket:
-        name: 'Your Name'
-        kind: 'Ticket Type'
-        email: 'Email Address'
+      sponsor_event:
+        title: 'Event Title'
+        starts_at: 'Start Time'
+        url: 'Event URL'
+        price: 'Price'
+        capacity: 'Capacity'
+        location_en: 'Location (English)'
+        location_local: 'Location (Japanese)'
+        slug: 'Slug'
+        status: 'Status'
+        link_name: 'Button Text'
+        admin_comment: 'Admin Comment'
+        policy_acknowledged_at: 'Policy Acknowledged At'
+        policy_agreement: 'I agree to the event policy'
+
+      expense_report/status:
+        draft: 'Draft'
+        submitted: 'Submitted'
+        approved: 'Approved'
+        rejected: 'Rejected'
+
     errors:
       models:
         sponsorship:
@@ -41,25 +65,20 @@ en:
               unchangeable_after_finalization: "cannot be changed once the sponsorship is finalized."
               no_plan_not_allowed: "must be chosen (cannot be 'Other')"
             organization:
-              taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
+              taken: "There is already a sponsorship application from your organization (determined by email domain). Choose a different email address or contact us if you want to have multiple sponsorships."
             booth_requested:
-              not_eligible: "is not eligible in your selected plan."
-            commercial_message_movie_requested:
               not_eligible: "is not eligible in your selected plan."
             profile:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
   helpers:
+    download_previously_uploaded: '(Download previously uploaded file)'
     label:
       'sponsorship[billing_request_attributes]': *billing_request
       'sponsorship[customization_request_attributes]': *customization_request
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
-        commercial_message_movie_requested: 'Request a Commercial Message Movie'
-    submit:
-      ticket:
-        create: 'Submit'
 
   layouts:
     application:
@@ -69,13 +88,28 @@ en:
       login: 'Log in'
       logout: 'Log out'
 
+  root:
+    index:
+      become_a_sponsor: "Become a sponsor"
+      sponsor_conference: "Sponsor %{conference}"
+      already_a_sponsor: "Already a sponsor?"
+      login: "Login"
+      no_open_applications: "There are currently no open sponsorship applications for %{org_name}. The application period has either ended or not yet begun."
+      choose_conference: "Choose a conference from below"
+
+  conferences:
+    index:
+      title: Conferences
+
   sessions:
     new:
+      title: Log in
       header: Log in
       description: "Enter your email address used for your sponsorship application to proceed."
       email_address: Email Address
       submit: Proceed
     claim:
+      title: Log in
       expired: "The link has been expired. Please obtain a new link in this login form."
     create:
       no_email_found: "We're sorry but no applications found for the email address you entered. Please try again or contact us."
@@ -90,24 +124,26 @@ en:
     user_email:
       subject: "Thank you for sponsoring us"
     admin_email:
-      subject: "New sponsorship application from: %{name}"
-  ticket_retrieval_mailer:
-    notify:
-      subject: 'Reminder of Your sponsor ticket'
-  unauthorized_ticket_warning_mailer:
-    notify:
-      subject: 'There was an unverified attendee from your organization'
+      subject: "New: %{name}"
 
   sponsorships:
+    new:
+      title: Apply
+    edit:
+      title: Edit Application
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
+      affiliated_organization_notice: 'This application will be affiliated with %{organization}.'
       copy:
         header: 'Filling the same information with your sponsorship application in past?'
         explanation: 'Select an existing application from below, then the existing data will be filled in.'
+        login_required: 'Please log in to copy from your past applications.'
       contact: 'Point of Contact'
+      email_help: "We recommend using a mailing list (group address) as a primary, and specify an individual email address to CC. It will help referencing past informations in future conferences."
       email_cc_help: "Enter alternate email addresses (comma separated). Announcements will be CC'd to these addresses. Note that these CC addresses cannot be used for logging into sponsor portal."
       billing: 'Billing Information'
+      billing_help: 'Please provide billing information for invoicing. If you have any special requests, use the additional note field below. Note that we will issue invoices in PDF format via email; No hardcopy will be sent.'
       specify_alternate_billing_contact: 'Specify an alternate contact for billing'
       billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
       plan: 'Sponsorship Package'
@@ -122,7 +158,6 @@ en:
           zero: 'No booth'
           one: 'Eligible for Booth'
           other: 'Eligible for Booth'
-        commercial_message_movie: 'Eligible for Commercial Message Movie'
         words_limit:
           zero: '0 word'
           one: 'About 1 word'
@@ -133,11 +168,19 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
-      commercial_message_movie: 'Commercial Message Movie'
-      commercial_message_movie_uneligible_plan_selected: 'Your selected plan is uneligible for commercial message movies; only available in %{plans} plan'
+      fallback_option: 'Configure Alternative Plan Preferences'
+      fallback_option_blank: '-- Make a selection --'
+      fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
+      fallback_priority:
+        header: 'Priority'
+        help: "This option sets the following priority order. Note that '(with booth)' in the following means a slot with booth allotment; It is not a booth request."
+      fallback_option_priority:
+        withdraw: 'Withdraw'
+        no_booth: 'without booth'
+        booth: 'with booth'
       information: 'Sponsor Information'
       information_help: |
-        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
+        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help_html: |
@@ -146,20 +189,31 @@ en:
         Please refer to <a href="https://esa-pages.io/p/sharing/14929/posts/628/b8d3eb89cc8ad85d0573.html">the template README</a> before submitting.
       others_help: |
         Use the following field for anything you want let us know in advance.
-      tickets: 'Attendee Tickets'
-      tickets_included_in_plan: 'Tickets included in the selected plan'
-      tickets_additionally_request: 'Additional Tickets'
-      tickets_total: 'Total number of Attendees'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
+      warnings:
+        english:
+          header: 'The introduction may contain non-English text'
+          body1: 'We request all informations to be filled in English, and non-English text are not permitted. Please confirm the above fields contain only English text, or use the following checkbox to acknowledge in case we are misdetecting non-English text.'
+          body2: 'If we find non-English text upon human review, we may ask you to correct it, and your information may not be published on our website until the correction is made.'
+          acknowledge: 'Yes, I acknowledge that the above fields consist of English text.'
+        zip_asset:
+          header: 'Verify your .zip archive meets our requirements'
+          item0: 'This .zip archive is not encrypted'
+          item1: 'This .zip archive contains vector files (like .ai, .svg, .pdf) for logos'
+          item2: 'This .zip archive contains a guideline if applicable'
+          item3: 'If multiple logos are included: Specify the file names in [Others] field below'
+          acknowledge: 'Yes, I have confirmed these requirements.'
     closed:
+      title: Application Closed
       header: 'Application form is not open'
       closed: "Thank you for your interest. But we're sorry, we have closed the sponsorship application for this conference at %{ts}."
       not_yet_open: "Thank you for your interest. But we're sorry, our application form is not yet open. Stay tuned!"
     create:
       notice: "Thank you for the application. We'll send you a confirmation email."
     show:
+      title: Sponsorship Portal
       header: "%{name} Sponsorship Portal"
       your_application: "Your application"
       edit: "Edit"
@@ -169,8 +223,6 @@ en:
       your_sponsorship_plan: "Your selected sponsorship plan"
       customized_plan: "Customized"
       sponsor_talk_eligible: "Includes a sponsor session"
-      included_guests: "Attendee tickets included in the plan"
-      additional_guests: "Additional tickets purchased"
       total_number_of_guests: "Total"
       guests_count:
         zero: 'no guests'
@@ -180,10 +232,6 @@ en:
         assigned: 'Sponsor Booth Assigned'
         requested: 'Sponsor Booth Requested'
         eligible: 'Sponsor Booth Eligible'
-      commercial_message_movie:
-        assigned: 'Commercial Message Movie Assigned'
-        requested: 'Commercial Message Movie Requested'
-        eligible: 'Commercial Message Movie Eligible'
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
       accepted: "Accepted / Finalized"
@@ -195,47 +243,349 @@ en:
         edit: 'Edit'
         new: 'Edit'
         not_submitted: 'Not Submitted Yet'
+      events:
+        title: 'Sponsor-hosted Events'
+        no_events: 'No events submitted yet.'
+        submit_new: 'Submit New Event'
+        status_pending: 'In review'
+        status_accepted: 'Accepted'
+        status_rejected: 'Rejected'
+        status_withdrawn: 'Withdrawn'
       tickets:
-        title: 'Invitations'
-        your_url: 'Invitation URL'
-        attendee_url: 'Attendee invitation URL'
-        booth_staff_url: 'Booth staff invitation URL'
+        title: 'Invitation and Passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes redemption'
+        booth_paid_url: 'Purchase additional booth passes'
+        quantity:
+          one: '%{count} pass'
+          other: '%{count} passes'
         help:
-          direction: 'To register, follow the instructions shown in the ticket page.'
-          requirement: 'All attendees who use a sponsor ticket must retrieve their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
-          unique: 'This URL is unique and bound to you, and there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+          requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
+          unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+        view_redemptions: 'Review registrations'
+      expense_report:
+        title: 'Custom package expense report'
+        create: 'Create Expense Report'
+        view: 'View or Edit Expense Report'
+        fee: 'Sponsorship fee'
+        total_expense: 'Total expense'
+        remaining: 'Remaining'
+      broadcasts:
+        title: 'Email based Announcements'
+        description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
+        view_all: 'View All Emails'
+      announcements: 'Announcements'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
+  expense_reports:
+    show:
+      title: Expense Report
+      header: "%{name} Expense Report"
+      editor:
+        loading: "Loading expense report..."
+        confirm_discard: "You have unsaved changes. Discard them?"
+        error_load: "Failed to load report"
+        fee: "Fee:"
+        expense: "Expense:"
+        plus_tax: "+ tax"
+        remaining: "Remaining:"
+        submit: "Submit for Review"
+        submitting: "Submitting..."
+        error_submit: "Failed to submit"
+        withdraw: "Withdraw Submission"
+        withdrawing: "Withdrawing..."
+        confirm_withdraw: "Withdraw this submission? You can re-submit later."
+        error_withdraw: "Failed to withdraw"
+        review_feedback: "Review feedback:"
+        back: "Back"
+        line_items: "Line Items"
+        add_line_item: "Add line item"
+        no_line_items: "No line items yet"
+        files: "Other Files"
+        drop_to_add: "Drop files to add or %{link}"
+        upload: "upload"
+        drop_unlinked: "Add as a new file"
+        select_line_item: "Select a line item"
+        create_from_file: "Create line item from this file"
+        creating: "Creating..."
+        delete_file: "Delete this file"
+        confirm_delete_file: "Delete this file?"
+        preview_file: "Preview file"
+        title_label: "Title"
+        notes_label: "Notes"
+        notes_placeholder: "(optional)"
+        tax_mode_label: "Tax mode"
+        tax_mode_exclude: "Entered amount excludes tax"
+        tax_mode_include: "Entered amount includes tax"
+        tax_mode_exempt: "Tax does not apply"
+        tax_mode_manual: "Enter amounts manually"
+        tax_rate_label: "Tax rate"
+        amount_excl: "Amount (excl. tax)"
+        amount_incl: "Amount (incl. tax)"
+        tax_amount_label: "Tax amount"
+        preliminal_label: "Preliminal (planned budget, not finalized)"
+        attached_files: "Attached files"
+        no_files_attached: "No files attached"
+        drop_or_upload: "Drop files here or %{link} to attach"
+        or_separator: "— or —"
+        link_existing: "Link existing file..."
+        save: "Save"
+        saving: "Saving..."
+        error_save: "Failed to save"
+        add_same_files: "Add line with the same files"
+        adding: "Adding..."
+        error_add: "Failed to add"
+        delete: "Delete"
+        deleting: "Deleting..."
+        confirm_delete_item: "Delete this line item?"
+        error_delete: "Failed to delete"
+        error_create: "Failed to create"
+        drop_link_to: "Link to \"%{title}\""
+        drop_create_item: "Create new line item"
+        select_file: "Select a file to preview"
+        no_preview: "Preview not available."
+        download: "Download"
+        preliminal_badge: "preliminal"
+        no_file_badge: "no file"
+        no_file_alert: "Some line items have no files attached. Attaching files is not mandatory, but please attach receipts or invoices where available."
+        link_to_existing_items: "Link to existing line items"
+        link_selected: "Link selected"
+        uploading: "Uploading files"
+        upload_failed: "Upload failed"
+        retry: "Retry"
+        discard: "Discard"
+        error_unsupported_file: "Unsupported file type: %{names}"
+        review_dialog_title: "Review before submission"
+        review_dialog_no_files: "No files"
+        review_dialog_unlinked_files: "Unlinked files"
+        review_dialog_base_fee: "Base sponsorship fee"
+        review_dialog_total_expense: "Total expense (excl. tax)"
+        review_dialog_remaining: "Remaining (amount to be billed)"
+        review_dialog_overage_warning: "RubyKaigi does not reimburse the amount exceeding the base fee."
+        review_dialog_cancel: "Cancel"
   exhibitions:
+    new:
+      title: Booth Details
+    edit:
+      title: Edit Booth Details
     create:
       notice: 'The booth plan has been submitted.'
     update:
       notice: 'The booth plan has been updated.'
     form:
       header: 'Booth Details'
-      help: "We will check to see if there is any conflict with the event's rules of use, etc. Please inform us of the details of your booth and project."
+      help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
-  tickets:
+
+  sponsor_events:
+    event_submission_not_open: 'Event submission is not open yet.'
+    sponsorship_not_accepted: 'Your sponsorship must be accepted before you can submit events.'
     new:
-      header: '%{name} Sponsorship Ticket Registration'
-      desc1: "Welcome! At this page, you can register yourself for %{conference} as an attendee using your sponsor ticket. By submitting the following form you'll get a QR code for the reception. You can:"
-      onsite:
-        head: 'Register using mobile device:'
-        desc: "You can visit this page using your mobile device and submit the form in advance, or while you are waiting in the registration queue."
-      print_in_advance:
-        head: 'Print in advance:'
-        desc: "Otherwise, you can submit the form now, then print the QR code out and bring it to the reception."
-      desc2: "Retrieving the ticket using mobile device is strongly recommended. See you soon at the venue!"
-      code_desc: "Use this code to open this page on your mobile device"
-      form:
-        from: 'from %{sponsorship}'
-        email_help: 'Optional (recommended). We will send a email to retrieve your code again.'
-        attendee_help: "Attend to the event as an attendee. Choose this if you're in doubt."
-        booth_staff_help: "Booth passes are not allowed to attend the sessions."
-        policy_help: "By submitting this form you agree to the following policy."
-        submit_help: "Note: submitting your information doesn't consume your organization's sponsor tickets immediately. Sponsor ticket will become used upon the registration in the venue."
+      title: Submit Event
+      header: Submit Event
+    edit:
+      title: Edit Event
+      header: Edit Event
+      withdrawn_not_editable: 'Withdrawn events cannot be edited. To make changes, please contact sponsor relations.'
     show:
-      guide1: "Present this page to the sponsor registration desk. You can use mobile device, or you may print this page out in advance and bring to the desk."
-      guide2: "The link to this page is sent to your email address."
-      reissue_guide: "You need an another ticket or made a mistake in your information?"
-      reissue_link: "Click here to register again"
+      title: Event Details
+      event_details: Event Details
+      actions: Actions
+      edit: Edit
+      withdraw: Withdraw
+      withdraw_confirm: 'Are you sure you want to withdraw this event? This cannot be undone by yourself.'
+      back_to_sponsorship: 'Back to Sponsorship Portal'
+    create:
+      notice: 'Your event has been submitted successfully.'
+    update:
+      notice: 'Your event has been updated successfully.'
+      withdrawn_not_editable: 'Withdrawn events cannot be edited.'
+    destroy:
+      notice: 'Your event has been withdrawn.'
+      withdrawn_not_editable: 'Withdrawn events cannot be edited.'
+    form:
+      asset_file: 'Image'
+      asset_file_help: 'A optional header/hero/banner image to show in the public event listing. Supported formats: PNG, JPEG, WebP (max 20 MB)'
+      starts_at_help: 'The start time of the event itself, not the doors/reception opening time.'
+      url_help: 'URL of the webpage for your event details or registration.'
+      location_local_help: 'We require the location name in the local language to help attendees find the venue.'
+      capacity_placeholder: 'e.g., 100'
+      price_placeholder: 'e.g., Free, 1000 JPY'
+      submit: Submit
+
+  views:
+    sponsor_events:
+      warnings:
+        english:
+          header: 'The event information may contain non-English text'
+          body1: 'We require all event information (except Location (Japanese)) to be in English. Please confirm the fields contain only English text, or check the box below if this detection is incorrect.'
+          body2: 'If non-English text is found upon review, we may ask you to correct it before your event is published.'
+          acknowledge: 'Yes, I acknowledge that the fields contain English text.'
+
+  broadcasts:
+    index:
+      title: 'Email History'
+      header: '%{name} - Email History'
+      empty: 'No emails have been sent yet.'
+      notice:
+        email_announcements: 'This page contains past email-based announcements.'
+        not_individual_emails_html: 'Individual email conversations and transcripts with %{contact_email} are not included.'
+        sponsorship_portal: 'sponsorship portal'
+        announcements_updated_html: 'The announcements list on the %{link} is continuously updated and reflects the current status as a summary. When viewing this page, please note that past emails may contain outdated information.'
+
+  pass_redemptions:
+    index:
+      title: Pass Redemptions
+      header: 'Pass Redemptions'
+      card_title: 'Registrations and Tickets'
+      no_registrations: 'No registrations have been made yet using the invitation URLs.'
+      invitation:
+        title: 'Conference invitations and passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes - Complimentary'
+        booth_paid_url: 'Booth passes - Purchase'
+        quantity:
+          one: '%{count} ticket'
+          other: '%{count} tickets'
+      table:
+        retract: 'Void'
+        registration_reference: 'Registration Ref#'
+        ticket_reference: 'Ticket Ref#'
+        release: 'Type'
+        registration_email: 'Registrant Email'
+        ticket_email: 'Assignee Email'
+        ticket_state: 'Status'
+      state:
+        unassigned: 'Unassigned'
+        complete: 'Complete'
+        incomplete: 'Incomplete'
+        void: 'Void'
+      release_type:
+        sponsor: 'Conference'
+        exhibitor: 'Booth pass'
+        'exhibitor-paid': 'Booth pass (paid)'
+      notes:
+        overview: 'This page displays the status of tickets and booth passes registered using the invitation URLs.'
+        incomplete_status: 'Tickets marked as [Incomplete] have not finished answering required questions and do not have a check-in QR code displayed. Please ensure ticket assignees complete them before arriving at the venue.'
+        registration_vs_ticket: 'The ticket management system Tito allows obtaining multiple tickets in a single registration (purchase), which the registrant can manage collectively. On this page, we refer to a registration (purchase) unit as [Registration] and the tickets associated with it as [Tickets]. When using invitation URLs, you can either distribute the URL directly to individuals for separate registrations, or have one person register all tickets at once and assign them to attendees through Tito.'
+        email_management: 'Emails are sent from @tito.io email address. To manage all tickets in a registration, refer to the ''Your %{conference_name} Confirmation'' email. Ticket assignees receive the ''Your %{conference_name} Ticket'' email instead, which allows them to manage only their assigned ticket.'
+        reassignment: 'Tickets can be reassigned from the email mentioned above. For security reasons, if an email address was registered incorrectly, we recommend voiding the ticket and re-registering.'
+        retraction_enabled: 'Also, you can cancel registrations from this page to restore your ticket quota. Click the [Void] button to start the cancellation process. Some registrations may not show a [Void] button; in such cases, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> with the tickets you wish to cancel and the reason. Note that paid booth passes cannot be cancelled nor refunded.'
+        retraction_disabled: 'For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> with the reason and ticket information; lhe automated cancellation feature has been disabled as the conference approaches. Note that paid booth passes cannot be cancelled.'
+
+  pass_retractions:
+    new:
+      title: Cancel Registration
+      header: 'Cancel Registration'
+      description: 'Request cancellation for registration %{reference}'
+      disabled_message: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
+      affected_tickets: 'Tickets to be voided'
+      reason_label: 'Reason for cancellation'
+      reason_placeholder: 'Brief reason for cancellation: e.g. mistyped email address'
+      not_retractable: 'This registration cannot be cancelled automatically. Note that paid booth passes cannot be cancelled.'
+      notes_header: 'Important notes'
+      note_1: 'All tickets listed above will be voided. Partial cancellation is not possible (cancellation is done per registration unit).'
+      note_2: 'If you want to reassign tickets, we recommend using the management links in emails sent from the Tito ticketing system (...@tito.io). Registrants should have received a ''Your %{conference_name} Confirmation'' email, and ticket assignees should have received a ''Your %{conference_name} Ticket'' email. If the email address was registered incorrectly, we recommend cancellation.'
+      note_3: 'Your ticket quota will be restored by the number of voided tickets. No automatic notifications will be sent to ticket assignees or registrants. It is your responsibility to inform them about the cancellation and how to obtain new tickets (if needed).'
+      confirmation_label: 'I understand and confirm the above information.'
+      submit: 'Submit'
+      cancel: 'Back to Pass Redemptions'
+    create:
+      notice: 'Cancellation request has been submitted.'
+      error: 'Unable to submit cancellation request.'
+    show:
+      title: Cancellation Request
+      header: 'Cancellation Request'
+      completed_header: 'Cancellation Completed'
+      completed_message: ''
+      completed_note_1: 'Your invitation URL has been made available again for the number of voided tickets'
+      completed_note_2: 'All tickets associated with this registration have been voided'
+      pending_header: 'Processing Cancellation'
+      pending_message: 'Your cancellation request is being processed. Please wait a moment.'
+      note_3: 'No automatic notifications will be sent to ticket assignees or registrants. It is your responsibility to inform them about the cancellation and how to obtain new tickets (if needed).'
+      reason: 'Reason'
+      registration_reference: 'Registration'
+      back: 'Back to Pass Redemptions'
+
+  admin:
+    sessions:
+      new:
+        title: Admin Login
+    conferences:
+      index:
+        title: Conferences
+      show:
+        title: "%{conference}"
+      new:
+        title: New Conference
+      edit:
+        title: Edit Conference
+      table_view:
+        title: Table View
+      attendees_keeper:
+        title: Check Attendees
+    sponsorships:
+      show:
+        title: "%{sponsorship}"
+      edit:
+        title: Edit Sponsorship
+    sponsorship_editing_histories:
+      index:
+        title: History
+    sponsorship_staff_notes:
+      index:
+        title: Notes
+      edit:
+        title: Edit Note
+    organizations:
+      index:
+        title: Organizations
+      show:
+        title: "%{organization}"
+      new:
+        title: New Organization
+      edit:
+        title: Edit Organization
+    plans:
+      new:
+        title: New Plan
+      edit:
+        title: Edit Plan
+    form_descriptions:
+      show:
+        title: Form Description
+      new:
+        title: New Form Description
+      edit:
+        title: Edit Form Description
+    broadcasts:
+      index:
+        title: Broadcasts
+      show:
+        title: "%{broadcast}"
+      new:
+        title: New Broadcast
+      edit:
+        title: Edit Broadcast
+    announcements:
+      index:
+        title: Announcements
+      show:
+        title: "%{announcement}"
+      new:
+        title: New Announcement
+      edit:
+        title: Edit Announcement
+    booth_assignments:
+      show:
+        title: Booth Assignments
+    sponsor_events:
+      index:
+        title: Events
+      show:
+        title: "%{event}"
+      edit:
+        title: Edit Event
+    sponsor_event_editing_histories:
+      index:
+        title: History

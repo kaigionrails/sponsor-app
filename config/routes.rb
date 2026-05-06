@@ -1,4 +1,5 @@
-require 'sidekiq/web'
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
@@ -6,6 +7,7 @@ Rails.application.routes.draw do
     get '/' => 'dashboard#index', as: :dashboard
     get '/slacktown' => 'dashboard#slacktown', as: :slacktown
     get '/mailtown' => 'dashboard#mailtown', as: :mailtown
+    get '/errortown' => 'dashboard#errortown', as: :errortown
 
     resources :conferences, param: :slug do
       member do
@@ -19,12 +21,34 @@ Rails.application.routes.draw do
 
       resource :booth_assignment, only: %i(show update)
 
-      resources :form_descriptions, except: %i(index)
-      resources :plans, except: %i(index show)
+      resources :form_descriptions, param: :locale, except: %i(index)
+      resources :plans, except: %i(show)
+
+      resources :expense_reports, only: %i(index)
 
       resources :sponsorships, except: %i(index new create) do
         resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         resources :sponsorship_staff_notes, as: :staff_notes, path: 'staff_notes', only: %i(index create edit update destroy)
+        resource :impersonation, only: %i(create), controller: 'sponsorship_impersonations'
+        member do
+          get :download_asset
+        end
+        resource :expense_report, only: %i(show update), controller: 'expense_reports' do
+          member do
+            get :calculate
+          end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
+          resources :reviews, controller: 'expense_report_reviews', only: %i(create)
+        end
+        resources :expense_files, only: %i(create update show destroy) do
+          member do
+            post :initiate_update
+          end
+        end
+      end
+
+      resources :sponsor_events, path: 'events', except: %i(new create destroy) do
+        resources :sponsor_event_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         member do
           get :download_asset
         end
@@ -38,29 +62,12 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    resources :organizations, param: :slug, only: %i(index new create show edit update), constraints: {slug: %r{[^/]+}}
+
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
-    end
-
-
-    mount Sidekiq::Web => '/sidekiq', :constraints => Module.new {
-      def self.matches?(request)
-        request.session[:staff_id] && Staff.where(id: request.session[:staff_id], restricted_repos: nil).exists?
-      end
-    }
-  end
-
-  get '/t/:handle' => 'reception/registrations#short_show', as: :reception_ticket
-
-  scope as: :reception, path: 'reception', module: 'reception' do
-    get 'session/assume/:handle' => 'sessions#assume', as: :assume_session
-
-    resources :conferences, param: :slug, only: %i(show) do
-      member do
-        get :code
-      end
-
-      resources :registrations, param: :code, only: %i(new show update create)
+      post :backdoor
     end
   end
 
@@ -75,21 +82,41 @@ Rails.application.routes.draw do
 
     resources :conferences, param: :slug, only: %i(index) do
       resource :sponsorship, only: %i(new create show edit update) do
+        resources :broadcasts, only: %i(index)
         resource :exhibition, only: %i(new create edit update)
+        resources :events, controller: 'sponsor_events', only: %i(new create show edit update destroy)
+        resources :pass_redemptions, only: %i(index) do
+          member do
+            resource :retraction, only: %i(new create show), controller: 'pass_retractions'
+          end
+        end
+        resource :expense_report, only: %i(create update show) do
+          member do
+            get :calculate
+          end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
+          resource :submission, controller: 'expense_report_submissions', only: %i(create destroy)
+        end
       end
-      resource :sponsorship_asset_file, only: %i(create update show)
-
-      resource :ticket, only: %i(new create show) do
-        get 'code' => 'tickets#code', as: :code
-        get 'new_code' => 'tickets#new_code', as: :new_code
-        get 'retrieve/:handle' => 'tickets#retrieve', as: :retrieve
+      resources :sponsorship_asset_files, only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
+      resources :event_asset_files, controller: 'sponsor_event_asset_files', only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
+      resources :expense_files, only: %i(create update show destroy) do
+        member do
+          post :initiate_update
+        end
       end
     end
 
-
     post '/webhooks/mailgun' => 'webhooks/mailgun#webhook'
   end
-
 
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

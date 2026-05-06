@@ -2,6 +2,11 @@
 - desc = conference.form_description_for_locale
 = form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
   = hidden_field_tag :invite_code, params[:invite_code]
+  = hidden_field_tag :affiliation, params[:affiliation]
+
+  - if @affiliated_organization
+    .alert.alert-info
+      = t('.affiliated_organization_notice', organization: @affiliated_organization.name)
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
@@ -25,6 +30,10 @@
           %p.card-text= t('.copy.explanation')
           .form-group
             = select_tag "sponsorship_id_to_copy", options_for_select(current_available_sponsorships.map {|_| [_.conference.name, _.id] }, params[:sponsorship_id_to_copy]), class: 'form-control form-control-sm sponsorship_id_to_copy_selector', include_blank: true
+  - elsif !sponsorship.persisted? && params[:sponsorship_id_to_copy].present?
+    %section.py-3
+      .alert.alert-info
+        = t('.copy.login_required')
 
   %section.py-2
     .form-group
@@ -34,6 +43,7 @@
       .form-group
         = contact_form.label :email
         = contact_form.email_field :email, class: 'form-control', required: true
+        %small.form-text= t('.email_help')
 
       .form-group
         = contact_form.label :email_cc
@@ -59,6 +69,7 @@
   %section.py-2.sponsorships_form_billing_contact
     .form-group
       %h3= t('.billing')
+      = t('.billing_help')
 
     = form.fields_for :alternate_billing_contact do |contact_form|
       .form-group
@@ -66,7 +77,7 @@
           = contact_form.check_box :_keep, class: 'form-check-input'
           = contact_form.label :_keep, t('.specify_alternate_billing_contact'), class: 'form-check-label'
 
-      %fieldset
+      %fieldset.d-none
         .form-group
           = contact_form.label :email
           = contact_form.email_field :email, class: 'form-control', required: true
@@ -98,21 +109,19 @@
       %h3= t('.plan')
       = desc.plan_help_html&.html_safe
 
-    %fieldset{disabled: @sponsorship.accepted?}
+    %fieldset{disabled: @sponsorship.persisted? && @sponsorship.accepted?}
       .form-group.sponsorships_form_plans
         %h5= t('.plans')
         - conference.plans.each do |plan|
           .form-check
             %label.form-check-label
-              = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', commercial_message_movie: plan.commercial_message_movie_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), acceptance_help: plan.auto_acceptance ? t('.plan_explanation.auto_acceptance', plan: plan.name) : t('.plan_explanation.not_auto_acceptance', plan: plan.name), guests: plan.number_of_guests}
+              = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), acceptance_help: plan.auto_acceptance ? t('.plan_explanation.auto_acceptance', plan: plan.name) : t('.plan_explanation.not_auto_acceptance', plan: plan.name), guests: plan.number_of_guests, plan_name: plan.name}
               = plan.name
               %small<
                 #{plan.price_text}
                 , #{t('.plan_explanation.guests', count: plan.number_of_guests)}
                 - if plan.booth_eligible?
                   , #{t('.plan_explanation.booth', count: plan.booth_size)}
-                - if plan.commercial_message_movie_eligible?
-                  , #{t('.plan_explanation.commercial_message_movie')}
                 - if plan.talkable?
                   , #{t('.plan_explanation.talk')}
               - case
@@ -124,7 +133,7 @@
         - if @conference.no_plan_allowed || (@sponsorship.persisted? && @sponsorship.plan_id == nil)
           .form-check
             %label.form-check-label
-              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
+              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0, plan_name: 'Other'}
               Other
 
     = form.fields_for :customization_request do |request_form|
@@ -143,18 +152,24 @@
         = form.label :booth_requested, class: 'form-check-label'
       %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
-  %section.py-2{class: @conference.commercial_message_movie_capacity > 0 ? '' : 'd-none'}
-    .form-group
-      %h3= t('.commercial_message_movie')
-      = desc.commercial_message_movie_help_html&.html_safe
+  - if desc.fallback_options.present? && desc.fallback_options.any?
+    %section.py-2.d-none.sponsorships_form_fallback_section{data: {locale_withdraw: t('.fallback_option_priority.withdraw'), locale_no_booth: t('.fallback_option_priority.no_booth'), locale_booth: t('.fallback_option_priority.booth')}}
+      .form-group
+        %h3= t('.fallback_option')
+        %p.form-text= t('.fallback_option_help')
 
-    .form-group.sponsorships_form_commercial_message_movie_request
-      .form-check
-        = form.check_box :commercial_message_movie_requested, class: 'form-check-input'
-        = form.label :commercial_message_movie_requested, class: 'form-check-label'
-      %small.d-none.sponsorships_form_commercial_message_movie_uneligible.form-text.text-small.text-info= t('.commercial_message_movie_uneligible_plan_selected', plans: conference.plans.select(&:commercial_message_movie_eligible?).map(&:name).join(', '))
+      .form-group
+        = form.label :fallback_option
+        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value, {data: opt.to_dataset}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control'
 
-  %section.py-2
+      .form-group
+        .card.d-none.sponsorships_form_fallback_priority
+          %h5.card-header= t('.fallback_priority.header')
+          .card-body
+            %p= t('.fallback_priority.help')
+            %ol
+
+  %section.py-2.sponsorships_form_info
     .form-group
       %h3= t('.information')
 
@@ -166,12 +181,25 @@
 
     .form-group
       = form.label :url
-      = form.text_field :url, class: 'form-control', required: true, placeholder: 'https://...'
+      = form.url_field :url, class: 'form-control', required: true, placeholder: 'https://...', pattern: '^https?://.+'
 
     .form-group
       = form.label :profile
       = form.text_area :profile, class: 'form-control', required: true
       %small.sponsorships_form_profile_help.form-text
+
+
+    %div.py-3.sponsorships_form_info__warning.d-none{data: {warning_kind: 'english'}}
+      .card
+        %h5.card-header= t('.warnings.english.header')
+        .card-body
+          %p.card-text= t('.warnings.english.body1')
+          %p.card-text= t('.warnings.english.body2')
+          .form-group.mb-0
+            .form-check
+              %input.form-check-input#sponsorships_form_english_ack{type: 'checkbox'}
+              %label.form-check-label{for: 'sponsorships_form_english_ack'}
+                = t('.warnings.english.acknowledge')
 
   %section.py-2
     .form-group
@@ -179,13 +207,57 @@
 
       %p= t('.logo_help_html')
 
-    .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
-      = form.hidden_field :asset_file_id
-      = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
-      .sponsorships_form_asset_file_form (Loading)
+      :ruby
+        asset_file_state = :new
+        if sponsorship.asset_file&.persisted?
+          asset_file_state = :existing
+          asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+          # Copying from another sponsorship (:copy) or failed validation (:unclaimed)
+          if sponsorship.new_record?
+            # We need to query it again as foo.assoc=other rewrites other.foo
+            asset_sponsorship = Sponsorship.includes(:asset_file, :conference).select(:id, :conference_id).where(asset_file: {id: sponsorship.asset_file_id}).first
+            claimed_asset_file = asset_sponsorship&.asset_file
+            if claimed_asset_file
+              asset_file_state = :copy
+              asset_file_url = user_conference_sponsorship_asset_file_path(asset_sponsorship.conference, claimed_asset_file)
+              raise "asset_file_state=:copy, assertion failed, conference_id must differ when copy; asset_file_id=#{sponsorship.asset_file.id}" unless asset_sponsorship.conference_id != conference.id
+            else
+              asset_file_state = :unclaimed
+              asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+            end
+          end
+        end
 
-    - if sponsorship.persisted? && sponsorship.asset_file
-      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path
+        form_params = case asset_file_state
+        when :new, :copy
+          {session_endpoint: user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST', asset_file_state: asset_file_state.to_s}
+        when :existing, :unclaimed
+          {session_endpoint: initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file), session_endpoint_method: 'POST', asset_file_state: asset_file_state.to_s}
+        else
+          raise "Unknown asset_file_state: #{asset_file_state}, sponsorship_asset_file_id: #{sponsorship.asset_file.id}"
+        end
+
+      .form-group.sponsorships_form_asset_file{data: form_params}
+        = form.hidden_field :asset_file_id
+        .sponsorships_form_asset_file_form (Loading)
+
+        - if sponsorship.asset_file
+          %small.form-text= link_to t('helpers.download_previously_uploaded'), asset_file_url
+
+    %div.py-3.sponsorships_form_asset_file_form__warning.d-none{data: {warning_kind: 'zip_asset'}}
+      .card
+        %h5.card-header= t('.warnings.zip_asset.header')
+        .card-body
+          %ul.card-text
+            %li= t('.warnings.zip_asset.item0')
+            %li= t('.warnings.zip_asset.item1')
+            %li= t('.warnings.zip_asset.item2')
+            %li= t('.warnings.zip_asset.item3')
+          .form-group.mb-0
+            .form-check
+              %input.form-check-input#sponsorships_form_zip_asset_ack{type: 'checkbox'}
+              %label.form-check-label{for: 'sponsorships_form_zip_asset_ack'}
+                = t('.warnings.zip_asset.acknowledge')
 
   - if conference.additional_attendees_registration_open
     %section.py-2.sponsorships_form_tickets

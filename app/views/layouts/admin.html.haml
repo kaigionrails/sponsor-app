@@ -3,16 +3,21 @@
   %head
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
-    - title = yield(:title)
-    %title= title.empty? ?  "#{Rails.application.config.x.org_name} sponsor-app admin" : title
+    - page_title = yield(:title)
+    - site_name = "#{Rails.application.config.x.org_name} Sponsorships Portal"
+    - if page_title.present?
+      %title= "#{page_title} - Admin | #{site_name}"
+    - else
+      %title= "Admin | #{site_name}"
     = csrf_meta_tags
     = csp_meta_tag
+    = vite_stylesheet_tag 'application.css'
 
-    = stylesheet_pack_tag 'vendor', media: 'all'
-    = begin; stylesheet_pack_tag 'admin', media: 'all'; rescue Simpacker::Manifest::MissingEntryError; end
+    %meta{name: 'rk:sentry-dsn', content: Rails.configuration.x.sentry.dsn}
+    %meta{name: 'rk:release', content: Rails.configuration.x.release.release}
 
-    - if Rails.application.config.x.sentry.dsn.present?
-      %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
+    = vite_client_tag
+    = vite_typescript_tag 'admin'
   %body
     %nav.navbar.navbar-expand-lg.navbar-light.bg-light
       %a.navbar-brand{href: '/'} #{Rails.application.config.x.org_name} Sponsorships Admin
@@ -22,6 +27,7 @@
         .navbar-nav
           - if current_staff
             %a.nav-item.nav-link{href: conferences_path} Conferences
+            %a.nav-item.nav-link{href: organizations_path} Organizations
       .collapse.navbar-collapse
         %ul.navbar-nav.ml-auto
           %li.nav-item
@@ -32,5 +38,3 @@
         - if notice
           .alert.alert-success= notice
         = yield
-    = javascript_pack_tag 'vendor'
-    = javascript_pack_tag 'admin'
