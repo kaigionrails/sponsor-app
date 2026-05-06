@@ -46,7 +46,6 @@ module Admin
         :booth_help,
         :policy_help,
         :ticket_help,
-        :commercial_message_movie_help,
         :fallback_options,
         :sponsor_event_help,
         :event_policy,

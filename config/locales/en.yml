@@ -7,7 +7,6 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
-        commercial_message_movie_requested: 'Commercial Message Movie Request'
         fallback_option: 'Alternative Plan Preference'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
@@ -69,8 +68,6 @@ en:
               taken: "There is already a sponsorship application from your organization (determined by email domain). Choose a different email address or contact us if you want to have multiple sponsorships."
             booth_requested:
               not_eligible: "is not eligible in your selected plan."
-            commercial_message_movie_requested:
-              not_eligible: "is not eligible in your selected plan."
             profile:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
@@ -82,7 +79,6 @@ en:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
-        commercial_message_movie_requested: 'Request a Commercial Message Movie'
 
   layouts:
     application:
@@ -162,7 +158,6 @@ en:
           zero: 'No booth'
           one: 'Eligible for Booth'
           other: 'Eligible for Booth'
-        commercial_message_movie: 'Eligible for Commercial Message Movie'
         words_limit:
           zero: '0 word'
           one: 'About 1 word'
@@ -173,8 +168,6 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
-      commercial_message_movie: 'Commercial Message Movie'
-      commercial_message_movie_uneligible_plan_selected: 'Your selected plan is uneligible for commercial message movies; only available in %{plans} plan'
       fallback_option: 'Configure Alternative Plan Preferences'
       fallback_option_blank: '-- Make a selection --'
       fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
@@ -239,10 +232,6 @@ en:
         assigned: 'Sponsor Booth Assigned'
         requested: 'Sponsor Booth Requested'
         eligible: 'Sponsor Booth Eligible'
-      commercial_message_movie:
-        assigned: 'Commercial Message Movie Assigned'
-        requested: 'Commercial Message Movie Requested'
-        eligible: 'Commercial Message Movie Eligible'
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
       accepted: "Accepted / Finalized"

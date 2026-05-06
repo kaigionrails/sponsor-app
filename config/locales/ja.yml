@@ -7,7 +7,6 @@ ja:
         url: 'URL'
         profile: '紹介文'
         booth_requested: 'ブース出展'
-        commercial_message_movie_requested: 'CM映像放送'
         fallback_option: '優先順位'
         number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
@@ -69,8 +68,6 @@ ja:
               taken: "同じ組織から既にスポンサーシップの申込があります (メールアドレスのドメインで判定しています)。別のメールアドレスを使用するか、複数のスポンサーシップを希望する場合はお問い合わせください。"
             booth_requested:
               not_eligible: "は選択されたスポンサープランでは対象外です"
-            commercial_message_movie_requested:
-              not_eligible: "は選択されたスポンサープランでは対象外です"
             profile:
               too_long: "が長過ぎます。選択されたプランでは %{maximum} 文字程度が上限となっています。"
 
@@ -82,7 +79,6 @@ ja:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'ブース出展する'
-        commercial_message_movie_requested: 'CM映像を掲載する'
 
   layouts:
     application:
@@ -163,7 +159,6 @@ ja:
           zero: 'ブースなし'
           one: 'ブース出展可能'
           other: 'ブース出展可能'
-        commercial_message_movie: 'CM映像放映可能'
         words_limit:
           zero: '0文字'
           one: '1文字'
@@ -174,8 +169,6 @@ ja:
       plan_closed: '受付期間終了'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
-      commercial_message_movie: 'CM映像放映'
-      commercial_message_movie_uneligible_plan_selected: '選択されたプランではCM映像放映はできません (%{plans} プランのみが対象となります)'
       fallback_option: '代替の希望プランを設定する'
       fallback_option_blank: '-- 選択してください --'
       fallback_option_help: '選択したプランは抽選などにより希望に沿えない可能性がございます。その場合に備え、代替のプランを選択してください。'
@@ -244,10 +237,6 @@ ja:
         assigned: 'ブース有り'
         requested: 'ブース対応 (申し込み済)'
         eligible: 'ブース対応 (申し込み無し)'
-      commercial_message_movie:
-        assigned: 'CM映像放映あり'
-        requested: 'CM映像放映対応 (申し込み済)'
-        eligible: 'CM映像放映対応 (申し込み無し)'
       undetermined_plan: '未決定'
       undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
       accepted: "確定済"

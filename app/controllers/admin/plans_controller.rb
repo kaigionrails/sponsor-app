@@ -52,7 +52,6 @@ module Admin
         :booth_size,
         :words_limit,
         :auto_acceptance,
-        :commercial_message_movie_eligible,
         :closes_at,
       )
     end

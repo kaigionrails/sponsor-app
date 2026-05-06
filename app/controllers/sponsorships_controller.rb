@@ -115,7 +115,6 @@ class SponsorshipsController < ApplicationController
       :asset_file_id,
       :asset_file_id_to_copy,
       :booth_requested,
-      :commercial_message_movie_requested,
       :fallback_option,
       :number_of_additional_attendees,
       contact_attributes: %i(id email email_cc address organization unit name),

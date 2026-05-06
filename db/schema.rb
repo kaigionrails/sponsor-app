@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,7 +78,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
     t.datetime "application_closes_at", precision: nil
     t.datetime "application_opens_at", precision: nil
     t.integer "booth_capacity", default: 0, null: false
-    t.integer "commercial_message_movie_capacity", default: 0, null: false
     t.string "contact_email_address"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "event_submission_starts_at"
@@ -210,8 +209,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
   create_table "form_descriptions", force: :cascade do |t|
     t.text "booth_help"
     t.text "booth_help_html"
-    t.text "commercial_message_movie_help"
-    t.text "commercial_message_movie_help_html"
     t.bigint "conference_id", null: false
     t.datetime "created_at", precision: nil, null: false
     t.text "event_policy", default: "", null: false
@@ -249,7 +246,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
     t.integer "booth_size"
     t.integer "capacity", null: false
     t.datetime "closes_at", precision: nil
-    t.boolean "commercial_message_movie_eligible", default: false, null: false
     t.bigint "conference_id", null: false
     t.datetime "created_at", precision: nil, null: false
     t.string "name", null: false
@@ -388,8 +384,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
     t.datetime "accepted_at", precision: nil
     t.boolean "booth_assigned", default: false, null: false
     t.boolean "booth_requested", default: false, null: false
-    t.boolean "commercial_message_movie_assigned", default: false, null: false
-    t.boolean "commercial_message_movie_requested", default: false, null: false
     t.bigint "conference_id", null: false
     t.datetime "created_at", precision: nil, null: false
     t.boolean "customization", default: false, null: false

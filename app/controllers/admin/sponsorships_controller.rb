@@ -58,7 +58,6 @@ module Admin
         :profile,
         :logo_key,
         :booth_requested,
-        :commercial_message_movie_requested,
         :fallback_option,
         :customization,
         :customization_name,

@@ -57,24 +57,6 @@
                     Eligible
                   - else
                     N/A
-              .row
-                %dt.col-sm-4 CM Movie
-                %dd.col-sm-8
-                  - case
-                  - when @sponsorship.commercial_message_movie_assigned && !@sponsorship.commercial_message_movie_requested
-                    Assigned but Not requested (!?)
-                  - when !@sponsorship.plan&.commercial_message_movie_eligible? && (@sponsorship.commercial_message_movie_assigned)
-                    Not Eligible but Assigned (!?)
-                  - when !@sponsorship.plan&.commercial_message_movie_eligible? && (@sponsorship.commercial_message_movie_requested)
-                    Not Eligible but Requested (!?)
-                  - when @sponsorship.commercial_message_movie_assigned
-                    Assigned
-                  - when @sponsorship.commercial_message_movie_requested
-                    Requested
-                  - when @sponsorship.plan&.commercial_message_movie_eligible?
-                    Eligible
-                  - else
-                    N/A
 
             %h5.card-title Plan
 

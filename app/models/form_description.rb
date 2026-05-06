@@ -119,7 +119,6 @@ class FormDescription < ApplicationRecord
       booth_help
       policy_help
       ticket_help
-      commercial_message_movie_help
       sponsor_event_help
       event_policy
     ).each do |field|
