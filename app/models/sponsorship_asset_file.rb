@@ -6,15 +6,6 @@ class SponsorshipAssetFile < ApplicationRecord
   ALLOWED_CONTENT_TYPES = %w[
     image/jpeg
     image/png
-    image/gif
-    image/webp
-    image/svg+xml
-    application/pdf
-    application/zip
-    application/x-zip-compressed
-    application/postscript
-    application/illustrator
-    application/octet-stream
   ].freeze
 
   belongs_to :sponsorship, optional: true
