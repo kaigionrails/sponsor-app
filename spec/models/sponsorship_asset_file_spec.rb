@@ -20,7 +20,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
     end
 
     describe 'content_type' do
-      %w[image/jpeg image/png image/gif image/webp image/svg+xml application/pdf application/zip application/x-zip-compressed application/postscript application/illustrator application/octet-stream].each do |type|
+      %w[image/jpeg image/png].each do |type|
         it "allows #{type}" do
           file = FactoryBot.build(:sponsorship_asset_file, sponsorship:, content_type: type)
           file.valid?
@@ -28,7 +28,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         end
       end
 
-      %w[text/html text/plain application/javascript style/css].each do |type|
+      %w[image/gif image/webp image/svg+xml application/pdf application/zip application/x-zip-compressed application/postscript application/illustrator application/octet-stream text/html text/plain application/javascript style/css].each do |type|
         it "rejects #{type}" do
           file = FactoryBot.build(:sponsorship_asset_file, sponsorship:, content_type: type)
           file.valid?
