@@ -23,6 +23,9 @@ nav.navbar.navbar-expand-lg.navbar-dark
   background-color: $color_navy
   box-shadow: $nav-shadow
 
+nav.navbar.navbar-expand-lg.navbar-light
+  background-color: $color_pink
+
 nav.navbar.navbar-expand-lg a,
 nav.navbar.navbar-expand-lg a.dropdown-item,
 .navbar-dark .navbar-nav .nav-link
@@ -46,6 +49,7 @@ nav.navbar.navbar-expand-lg a.dropdown-item
 .btn-primary
   background-color: $btn-primary-bg
   border-color: $btn-primary-border
+  color: $white !important
   &:hover
     background-color: $btn-primary-bg-hover
     border-color: $btn-primary-border-hover
@@ -64,6 +68,9 @@ nav.navbar.navbar-expand-lg a.dropdown-item
   border-color: $btn-primary-border-hover
   box-shadow: 0 0 0 0.2rem rgba($btn-primary-bg, .5)
 
+.btn-secondary
+  color: $white !important
+
 .dropdown-item.active, .dropdown-item:active
   color: #fff
   background-color: $btn-primary-bg
@@ -81,3 +88,22 @@ h1, h2, h3, .h2, h3
 .form-group
   label
     font-weight: 600
+
+.alert-info
+  a
+    color: $color_pink
+
+.card
+  color: $black
+  a
+    color: $color_pink
+
+.breadcrumb
+  a
+    color: $color_pink
+
+.pre-json
+  color: $white
+
+.plan-table
+  color: $white
