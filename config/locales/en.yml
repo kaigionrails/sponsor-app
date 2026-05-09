@@ -172,8 +172,8 @@ en:
       fallback_option_blank: '-- Make a selection --'
       fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
       fallback_priority:
-        header: 'Priority'
-        help: "This option sets the following priority order. Note that '(with booth)' in the following means a slot with booth allotment; It is not a booth request."
+        header: 'About Alternative Plan'
+        help_html: '<ul><li>Sponsors not selected for the Ruby plan but selected for a booth will be automatically moved to the Gold plan.</li><li>Sponsors not selected for a booth will be handled according to the option selected above.</li></ul>'
       fallback_option_priority:
         withdraw: 'Withdraw'
         no_booth: 'without booth'
