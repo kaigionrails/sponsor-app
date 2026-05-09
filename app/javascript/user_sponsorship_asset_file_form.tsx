@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
-          accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
+          accept="image/png,image/jpeg"
           onFileChange={onFileChange}
         />
       );
