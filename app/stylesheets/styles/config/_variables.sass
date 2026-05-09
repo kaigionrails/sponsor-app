@@ -11,15 +11,17 @@ $whitegrey: #A9A9A9
 // Theming Colors
 //////////////////////
 $color_navy: oklch(26% 0.0100 39.33)
+$color_pink: #ff2e9b
+$color_green: #ceff05
 $color_red: #eb0064
 $color_yellow: #ff6
 $color_midgray: #ccc
 $color_lightgray: #eee
 
-$color-base: $color_navy
-$color-main: $color_lightgray
+$color-base: $black
+$color-main: $white
 $color-main-light: #6c6c81
-$color-accent: $color_red
+$color-accent: $color_pink
 $color-reversal: $color_lightgray
 
 
@@ -45,8 +47,8 @@ $default-text: $color-main
 $reversal-text: $color-reversal
 $muted-text: $color-main-light
 
-$link: #1E4EC4
-$link-hover: #1E4DAD
+$link: $color_green
+$link-hover: darken($color_green, 10%)
 
 $border: $color-main-light
 
@@ -65,7 +67,7 @@ $nav-toggler-border: transparent
 // button
 $btn-primary-bg: $color-accent
 $btn-primary-border: transparent
-$btn-primary-bg-hover: darken($color-accent, 10%)
+$btn-primary-bg-hover: darken($color_pink, 15%)
 $btn-primary-border-hover: transparent
 
 // schedule
