@@ -57,6 +57,24 @@
                     Eligible
                   - else
                     N/A
+              .row
+                %dt.col-sm-4 Print Sticker
+                %dd.col-sm-8
+                  - case
+                  - when @sponsorship.print_sticker_sponsor_assigned? && !@sponsorship.print_sticker_sponsor_requested?
+                    &#x1F381; Assigned but Not requested (!?)
+                  - when !@sponsorship.plan&.print_sticker_sponsor_eligible? && @sponsorship.print_sticker_sponsor_assigned?
+                    &#x1F49D; Not Eligible but Assigned (!?)
+                  - when !@sponsorship.plan&.print_sticker_sponsor_eligible? && @sponsorship.print_sticker_sponsor_requested?
+                    &#x2753; Not Eligible but Requested (!?)
+                  - when @sponsorship.print_sticker_sponsor_assigned?
+                    &#x2705; Assigned
+                  - when @sponsorship.print_sticker_sponsor_requested?
+                    &#x1F5F3;&#xFE0F; Requested
+                  - when @sponsorship.plan&.print_sticker_sponsor_eligible?
+                    Eligible
+                  - else
+                    N/A
 
             %h5.card-title Plan
 

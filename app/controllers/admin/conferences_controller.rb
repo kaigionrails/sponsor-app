@@ -141,6 +141,7 @@ module Admin
         :amendment_closes_at,
         :event_submission_starts_at,
         :booth_capacity,
+        :print_sticker_sponsor_capacity,
         :contact_email_address,
         :additional_attendees_registration_open,
         :github_repo,

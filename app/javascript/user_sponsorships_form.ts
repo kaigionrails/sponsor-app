@@ -78,6 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const uneligibleHelpTextElem = formElem.querySelector(
         ".sponsorships_form_booth_request_uneligible",
       ) as Element;
+      const printStickerSponsorCheckbox = formElem.querySelector(
+        ".sponsorships_form_print_sticker_sponsor_request input[type=checkbox]",
+      ) as HTMLInputElement | null;
+      const printStickerSponsorHelpTextElem = formElem.querySelector(
+        ".sponsorships_form_print_sticker_sponsor_uneligible",
+      ) as Element | null;
       const customizationRequestField = document.querySelector(
         ".sponsorships_form_customization_request",
       ) as HTMLTextAreaElement;
@@ -96,6 +102,17 @@ document.addEventListener("DOMContentLoaded", () => {
           uneligibleHelpTextElem.classList.remove("d-none");
           boothCheckbox.checked = false;
           boothCheckbox.disabled = true;
+        }
+
+        if (printStickerSponsorCheckbox && printStickerSponsorHelpTextElem) {
+          if (e?.dataset.printStickerSponsor == "1") {
+            printStickerSponsorHelpTextElem.classList.add("d-none");
+            printStickerSponsorCheckbox.disabled = false;
+          } else {
+            printStickerSponsorHelpTextElem.classList.remove("d-none");
+            printStickerSponsorCheckbox.checked = false;
+            printStickerSponsorCheckbox.disabled = true;
+          }
         }
 
         const wordsLimitHelp = e?.dataset.wordsLimitHelp;

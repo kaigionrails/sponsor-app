@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_08_233203) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
     t.string "name", null: false
     t.boolean "no_plan_allowed", default: true, null: false
     t.datetime "pass_retraction_disables_at"
+    t.integer "print_sticker_sponsor_capacity", default: 0, null: false
     t.string "reception_key", null: false
     t.string "slug"
     t.datetime "ticket_distribution_starts_at", precision: nil
@@ -221,6 +222,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
     t.text "plan_help_html"
     t.text "policy_help"
     t.text "policy_help_html"
+    t.text "print_sticker_sponsor_help"
+    t.text "print_sticker_sponsor_help_html"
     t.text "sponsor_event_help", default: "", null: false
     t.text "sponsor_event_help_html", default: "", null: false
     t.text "ticket_help"
@@ -253,6 +256,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
     t.decimal "price", precision: 12, scale: 2, default: "0.0", null: false
     t.decimal "price_booth", precision: 12, scale: 2, default: "0.0", null: false
     t.string "price_text"
+    t.boolean "print_sticker_sponsor_eligible", default: false, null: false
     t.integer "rank", default: 0, null: false
     t.string "summary"
     t.boolean "talkable"
@@ -394,6 +398,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_075519) do
     t.integer "number_of_additional_attendees"
     t.bigint "organization_id", null: false
     t.bigint "plan_id"
+    t.boolean "print_sticker_sponsor_assigned", default: false, null: false
+    t.boolean "print_sticker_sponsor_requested", default: false, null: false
     t.text "profile", null: false
     t.boolean "suspended", default: false, null: false
     t.string "ticket_key", null: false

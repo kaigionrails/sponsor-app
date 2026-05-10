@@ -159,6 +159,25 @@ RSpec.describe Sponsorship, type: :model do
       other_sponsorship = FactoryBot.build(:sponsorship, conference: other_conference, organization:)
       expect(other_sponsorship).to be_valid
     end
+
+    it 'allows print sticker sponsor request with an eligible plan' do
+      FactoryBot.create(:form_description, conference:)
+      eligible_plan = FactoryBot.create(:plan, conference:, print_sticker_sponsor_eligible: true)
+      sponsorship = FactoryBot.build(:sponsorship, conference:, plan: eligible_plan, print_sticker_sponsor_requested: true)
+      sponsorship.policy_agreement = true
+
+      expect(sponsorship).to be_valid(:update_by_user)
+    end
+
+    it 'rejects print sticker sponsor request with an ineligible plan' do
+      FactoryBot.create(:form_description, conference:)
+      ineligible_plan = FactoryBot.create(:plan, conference:, print_sticker_sponsor_eligible: false)
+      sponsorship = FactoryBot.build(:sponsorship, conference:, plan: ineligible_plan, print_sticker_sponsor_requested: true)
+      sponsorship.policy_agreement = true
+
+      expect(sponsorship).not_to be_valid(:update_by_user)
+      expect(sponsorship.errors.of_kind?(:print_sticker_sponsor_requested, :not_eligible)).to be true
+    end
   end
 
   describe 'state management' do
@@ -384,6 +403,8 @@ RSpec.describe Sponsorship, type: :model do
       expect(hash['name']).to eq(sponsorship.name)
       expect(hash['url']).to eq(sponsorship.url)
       expect(hash['profile']).to eq(sponsorship.profile)
+      expect(hash['print_sticker_sponsor_requested']).to eq(sponsorship.print_sticker_sponsor_requested)
+      expect(hash['print_sticker_sponsor_assigned']).to eq(sponsorship.print_sticker_sponsor_assigned)
       expect(hash['plan_id']).to eq(plan.id)
       expect(hash['plan_name']).to eq(plan.name)
       expect(hash['accepted_at']).to be_present

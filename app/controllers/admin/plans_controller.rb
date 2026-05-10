@@ -50,6 +50,7 @@ module Admin
         :capacity,
         :number_of_guests,
         :booth_size,
+        :print_sticker_sponsor_eligible,
         :words_limit,
         :auto_acceptance,
         :closes_at,

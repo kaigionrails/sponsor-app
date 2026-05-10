@@ -7,6 +7,8 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
+        print_sticker_sponsor_requested: 'Print sticker sponsor'
+        print_sticker_sponsor_assigned: 'Print sticker sponsor assigned'
         fallback_option: 'Alternative Plan Preference'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
@@ -28,9 +30,14 @@ en:
 
       conference:
         pass_retraction_disables_at: 'Pass Retraction Disables At'
+        print_sticker_sponsor_capacity: 'Print sticker sponsor capacity'
 
       form_description:
         fallback_options: 'Fallback Options'
+        print_sticker_sponsor_help: 'Print sticker sponsor help'
+
+      plan:
+        print_sticker_sponsor_eligible: 'Print sticker sponsor eligible'
 
       exhibition:
         description: 'Booth Plan'
@@ -68,6 +75,8 @@ en:
               taken: "There is already a sponsorship application from your organization (determined by email domain). Choose a different email address or contact us if you want to have multiple sponsorships."
             booth_requested:
               not_eligible: "is not eligible in your selected plan."
+            print_sticker_sponsor_requested:
+              not_eligible: "is not eligible in your selected plan."
             profile:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
@@ -79,6 +88,8 @@ en:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
+        print_sticker_sponsor_requested: 'Request the print sticker sponsor option'
+        print_sticker_sponsor_assigned: 'Assign the print sticker sponsor option'
 
   layouts:
     application:
@@ -158,6 +169,7 @@ en:
           zero: 'No booth'
           one: 'Eligible for Booth'
           other: 'Eligible for Booth'
+        print_sticker_sponsor: 'Eligible for print sticker sponsor'
         words_limit:
           zero: '0 word'
           one: 'About 1 word'
@@ -166,8 +178,10 @@ en:
         auto_acceptance: "Your sponsorship application will be finalized immediately upon submit."
       plan_sold_out: 'Sold Out'
       plan_closed: 'Closed'
+      print_sticker_sponsor: 'Print sticker sponsor'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
+      print_sticker_sponsor_uneligible_plan_selected: 'Your selected plan is uneligible for the print sticker sponsor option; only available in %{plans} plan'
       fallback_option: 'Configure Alternative Plan Preferences'
       fallback_option_blank: '-- Make a selection --'
       fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
@@ -232,6 +246,10 @@ en:
         assigned: 'Sponsor Booth Assigned'
         requested: 'Sponsor Booth Requested'
         eligible: 'Sponsor Booth Eligible'
+      print_sticker_sponsor:
+        assigned: 'Print sticker sponsor assigned'
+        requested: 'Print sticker sponsor requested'
+        eligible: 'Print sticker sponsor eligible'
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
       accepted: "Accepted / Finalized"

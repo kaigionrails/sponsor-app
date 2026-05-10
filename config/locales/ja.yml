@@ -7,6 +7,8 @@ ja:
         url: 'URL'
         profile: '紹介文 (英語)'
         booth_requested: 'ブース出展'
+        print_sticker_sponsor_requested: 'プリントシール機スポンサー'
+        print_sticker_sponsor_assigned: 'プリントシール機スポンサー割当'
         fallback_option: '優先順位'
         number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
@@ -68,6 +70,8 @@ ja:
               taken: "同じ組織から既にスポンサーシップの申込があります (メールアドレスのドメインで判定しています)。別のメールアドレスを使用するか、複数のスポンサーシップを希望する場合はお問い合わせください。"
             booth_requested:
               not_eligible: "は選択されたスポンサープランでは対象外です"
+            print_sticker_sponsor_requested:
+              not_eligible: "は選択されたスポンサープランでは対象外です"
             profile:
               too_long: "が長過ぎます。選択されたプランでは英文 %{maximum} ワード程度が上限となっています。"
 
@@ -79,6 +83,8 @@ ja:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'ブース出展を希望する'
+        print_sticker_sponsor_requested: 'プリントシール機スポンサーとして協賛する'
+        print_sticker_sponsor_assigned: 'プリントシール機スポンサーを割り当てる'
 
   layouts:
     application:
@@ -159,6 +165,7 @@ ja:
           zero: 'ブースなし'
           one: 'ブース出展可能'
           other: 'ブース出展可能'
+        print_sticker_sponsor: 'プリントシール機スポンサー対象'
         words_limit:
           zero: '英文 0 word'
           one: '英文 1 word'
@@ -167,8 +174,10 @@ ja:
         not_auto_acceptance: '選択されているプラン %{plan} ではスポンサー申込について後日確定となります。申し込み後のアナウンスをお待ちください。'
       plan_sold_out: '受付終了'
       plan_closed: '受付期間終了'
+      print_sticker_sponsor: 'プリントシール機スポンサー'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
+      print_sticker_sponsor_uneligible_plan_selected: '選択されたプランではプリントシール機スポンサーは対象外です (%{plans} プランのみが対象となります)'
       fallback_option: '代替の希望プランを設定する'
       fallback_option_blank: '-- 選択してください --'
       fallback_option_help: '選択したプランは抽選などにより希望に沿えない可能性がございます。その場合に備え、代替のプランを選択してください。'
@@ -237,6 +246,10 @@ ja:
         assigned: 'ブース有り'
         requested: 'ブース対応 (申し込み済)'
         eligible: 'ブース対応 (申し込み無し)'
+      print_sticker_sponsor:
+        assigned: 'プリントシール機スポンサー有り'
+        requested: 'プリントシール機スポンサー (申し込み済)'
+        eligible: 'プリントシール機スポンサー対象 (申し込み無し)'
       undetermined_plan: '未決定'
       undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
       accepted: "確定済"

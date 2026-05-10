@@ -115,6 +115,7 @@ class SponsorshipsController < ApplicationController
       :asset_file_id,
       :asset_file_id_to_copy,
       :booth_requested,
+      :print_sticker_sponsor_requested,
       :fallback_option,
       :number_of_additional_attendees,
       contact_attributes: %i(id email email_cc address organization unit name),

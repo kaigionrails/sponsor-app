@@ -85,6 +85,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_plan_change, on: :update_by_user
   validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility, on: :update_by_user
+  validate :validate_print_sticker_sponsor_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
   validate :validate_fallback_option, on: :update_by_user
@@ -196,6 +197,8 @@ class Sponsorship < ApplicationRecord
       "customization_request" => customization_request&.body,
       "booth_requested" => booth_requested,
       "booth_assigned" => booth_assigned,
+      "print_sticker_sponsor_requested" => print_sticker_sponsor_requested,
+      "print_sticker_sponsor_assigned" => print_sticker_sponsor_assigned,
       "name" => name,
       "url" => url,
       "profile" => profile,
@@ -293,6 +296,12 @@ class Sponsorship < ApplicationRecord
   private def validate_booth_eligibility
     if booth_requested && !plan&.booth_eligible?
       errors.add :booth_requested, :not_eligible
+    end
+  end
+
+  private def validate_print_sticker_sponsor_eligibility
+    if print_sticker_sponsor_requested && !plan&.print_sticker_sponsor_eligible?
+      errors.add :print_sticker_sponsor_requested, :not_eligible
     end
   end
 
