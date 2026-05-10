@@ -117,6 +117,7 @@ class FormDescription < ApplicationRecord
       head
       plan_help
       booth_help
+      print_sticker_sponsor_help
       policy_help
       ticket_help
       sponsor_event_help

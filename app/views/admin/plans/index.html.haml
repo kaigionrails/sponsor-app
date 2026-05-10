@@ -20,6 +20,7 @@
           %th Capacity
           %th Guests
           %th Booth Size
+          %th Print Sticker Sponsor
           %th Words Limit
           %th Closes At
           %th Auto Accept
@@ -34,6 +35,11 @@
             %td= plan.capacity
             %td= plan.number_of_guests
             %td= plan.booth_size
+            %td
+              - if plan.print_sticker_sponsor_eligible
+                %span.badge.badge-success Yes
+              - else
+                %span.badge.badge-secondary No
             %td= plan.words_limit
             %td
               - if plan.closes_at
