@@ -25,6 +25,24 @@ nav.navbar.navbar-expand-lg.navbar-dark
 
 nav.navbar.navbar-expand-lg.navbar-light
   background-color: $color_pink
+  .navbar-brand
+    color: $white
+    &:hover, &:focus
+      color: $white
+  .navbar-nav .nav-link
+    color: $white
+    &:hover, &:focus
+      color: rgba($white, .85)
+  .navbar-nav .show > .nav-link,
+  .navbar-nav .active > .nav-link
+    color: $white
+  .navbar-text
+    color: $white
+    a
+      color: $white
+  .navbar-toggler
+    color: rgba($white, .7)
+    border-color: rgba($white, .3)
 
 nav.navbar.navbar-expand-lg a,
 nav.navbar.navbar-expand-lg a.dropdown-item,
@@ -90,17 +108,24 @@ h1, h2, h3, .h2, h3
     font-weight: 600
 
 .alert-info
-  a
+  a:not(.btn)
     color: $color_pink
 
 .card
   color: $black
-  a
+  a:not(.btn)
     color: $color_pink
 
 .breadcrumb
-  a
+  background-color: $color-bg-card
+  border: 1px solid $color-line
+  a:not(.btn)
     color: $color_pink
+
+.breadcrumb-item
+  color: $color-text-muted
+  &.active
+    color: $white
 
 .pre-json
   color: $white
