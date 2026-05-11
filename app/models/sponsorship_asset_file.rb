@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SponsorshipAssetFile < ApplicationRecord
+  PREFIX = ENV['S3_FILES_PREFIX']
+
   include AssetFileUploadable
 
   ALLOWED_CONTENT_TYPES = %w[
@@ -39,6 +41,11 @@ class SponsorshipAssetFile < ApplicationRecord
     )
     dst.update_object_header
     dst
+  end
+
+  def object_key
+    raise unless self.persisted?
+    "#{PREFIX}#{prefix}#{handle}--#{id}.#{extension}"
   end
 
   def filename
