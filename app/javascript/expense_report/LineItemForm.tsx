@@ -352,10 +352,15 @@ export function LineItemForm({
 
       {(() => {
         const { netAmount, taxAmt } = deriveAmounts();
-        const total = (parseFloat(netAmount) || 0) + (parseFloat(taxAmt) || 0);
+        // Sum in the smallest unit to avoid binary float drift
+        // (e.g. 0.1 + 0.2 = 0.30000000000000004).
+        const totalUnits =
+          Math.round((parseFloat(netAmount) || 0) * factor) +
+          Math.round((parseFloat(taxAmt) || 0) * factor);
+        const total = (totalUnits / factor).toFixed(decimal);
         return (
           <div className="small text-muted mb-2">
-            {i18n.total_incl_label}: {formatAmount(total.toFixed(decimal), decimal)}
+            {i18n.total_incl_label}: {formatAmount(total, decimal)}
           </div>
         );
       })()}
