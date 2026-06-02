@@ -1,6 +1,8 @@
 .text-center.mt-5
   %img.portal-logo{src: '/images/logo-top.svg', alt: Rails.application.config.x.org_name}
-%h1.text-center.mt-3= "#{Rails.application.config.x.org_name} Sponsorships Portal"
+%h1.text-center.mt-3
+  = Rails.application.config.x.org_name
+  %span.portal-title-sub Sponsorships Portal
 
 - if @conferences.empty?
   .row.py-5
