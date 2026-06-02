@@ -11,6 +11,36 @@ body
 
 .container
   margin: 48px auto
+  background-color: rgba($black, .75)
+  padding: 32px
+  border-radius: 4px
+
+// トップページは全体枠を外し、各カラムを個別パネルにする
+body.root .container
+  background-color: transparent
+  padding: 0
+
+.portal-logo
+  width: 240px
+  height: auto
+
+// トップ2カラムのカード間 gap を広げる
+.portal-columns
+  +breakpoint-up(md)
+    margin-left: -24px
+    margin-right: -24px
+    > [class*="col-"]
+      padding-left: 24px
+      padding-right: 24px
+
+.portal-card
+  background-color: rgba($black, .6)
+  padding: 32px
+  border-radius: 16px
+  height: 100%
+  h2
+    font-size: 1.25rem
+    margin-bottom: 1.5rem
 
 .conference__list
   list-style: none

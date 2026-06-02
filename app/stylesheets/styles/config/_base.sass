@@ -1,11 +1,18 @@
 body
   color: $default-text
   background-color: $color_base
-  // background-image: url('/images/background.png')
-  background-position: center top
-  background-repeat: repeat !important
+  font-family: $font-body
   min-height: 100vh
   font-size: 100%
+
+.background
+  position: fixed
+  inset: 0
+  z-index: -1
+  background-image: url('/images/bg-crossing.webp')
+  background-repeat: no-repeat
+  background-position: center center
+  background-size: cover
 
 a
   color: $link
@@ -20,8 +27,10 @@ small
   font-size: 70%
 
 nav.navbar.navbar-expand-lg.navbar-dark
-  background-color: $color_navy
-  box-shadow: $nav-shadow
+  background-color: $black
+  .navbar-logo
+    height: 40px
+    width: auto
 
 nav.navbar.navbar-expand-lg.navbar-light
   background-color: $color_pink
@@ -67,10 +76,13 @@ nav.navbar.navbar-expand-lg a.dropdown-item
 .btn-primary
   background-color: $btn-primary-bg
   border-color: $btn-primary-border
-  color: $white !important
+  color: $black !important
+  padding: 0.6rem 1.5rem
+  font-weight: bold
   &:hover
     background-color: $btn-primary-bg-hover
     border-color: $btn-primary-border-hover
+    color: $black !important
 
 .btn-primary:not(:disabled):not(.disabled):active,
 .btn-primary:not(:disabled):not(.disabled).active,
@@ -101,7 +113,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6
   font-weight: 600
 
 h1, h2, h3, .h2, h3
-  font-family: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+  font-family: $font-display
 
 .form-group
   label
@@ -132,3 +144,6 @@ h1, h2, h3, .h2, h3
 
 .plan-table
   color: $white
+
+.card-header
+  border-bottom: 2px solid $color_green
