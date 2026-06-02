@@ -124,9 +124,20 @@ h1, h2, h3, .h2, h3
     color: $color_pink
 
 .card
-  color: $black
-  a:not(.btn)
-    color: $color_pink
+  background-color: $color-bg-card
+  color: $white
+  border: 1px solid $color-line
+  border-radius: 16px
+  overflow: hidden
+  .card-text a:not(.btn)
+    color: $link
+    &:hover,
+    &:focus
+      color: $link-hover
+  .list-group-item
+    background-color: transparent
+    border-color: $color-line
+    color: inherit
 
 .breadcrumb
   background-color: $color-bg-card
@@ -146,4 +157,6 @@ h1, h2, h3, .h2, h3
   color: $white
 
 .card-header
-  border-bottom: 2px solid $color_green
+  background-color: rgba($white, .1)
+  border-bottom: 1px solid $color-line
+  font-weight: 600
