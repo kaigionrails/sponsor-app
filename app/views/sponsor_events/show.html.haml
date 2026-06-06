@@ -4,7 +4,7 @@
 
 .row.py-2
   .col-md-8
-    .card.text-dark
+    .card
       .card-header= t('.event_details')
       .card-body
         %p.card-text
@@ -42,7 +42,7 @@
             = @sponsor_event.location_local
 
   .col-md-4
-    .card.text-dark
+    .card
       .card-header= SponsorEvent.human_attribute_name(:status)
       .card-body
         %p.card-text
@@ -63,7 +63,7 @@
           %p.card-text= @sponsor_event.admin_comment
 
     - if @sponsor_event.editable_by_sponsor? && current_conference.event_submission_open?
-      .card.mt-2.text-dark
+      .card.mt-2
         .card-header= t('.actions')
         .card-body
           %p.card-text

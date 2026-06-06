@@ -1,11 +1,18 @@
 body
   color: $default-text
   background-color: $color_base
-  // background-image: url('/images/background.png')
-  background-position: center top
-  background-repeat: repeat !important
+  font-family: $font-body
   min-height: 100vh
   font-size: 100%
+
+.background
+  position: fixed
+  inset: 0
+  z-index: -1
+  background-image: url('/images/bg-crossing.webp')
+  background-repeat: no-repeat
+  background-position: center center
+  background-size: cover
 
 a
   color: $link
@@ -20,8 +27,12 @@ small
   font-size: 70%
 
 nav.navbar.navbar-expand-lg.navbar-dark
-  background-color: $color_navy
-  box-shadow: $nav-shadow
+  background-color: $black
+  .navbar-logo
+    height: 40px
+    width: auto
+    +breakpoint-down(sm)
+      height: clamp(28px, 8vw, 40px)
 
 nav.navbar.navbar-expand-lg.navbar-light
   background-color: $color_pink
@@ -62,15 +73,23 @@ nav.navbar.navbar-expand-lg a.dropdown-item
   border-color: $nav-toggler-border
 
 .navbar-toggler .navbar-toggler-icon
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(11,55,77,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E")
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E")
+
+.btn
+  padding: $btn-padding-y $btn-padding-x
+  font-weight: bold
+
+.btn-sm
+  padding: $btn-sm-padding-y $btn-sm-padding-x
 
 .btn-primary
   background-color: $btn-primary-bg
   border-color: $btn-primary-border
-  color: $white !important
+  color: $black !important
   &:hover
     background-color: $btn-primary-bg-hover
     border-color: $btn-primary-border-hover
+    color: $black !important
 
 .btn-primary:not(:disabled):not(.disabled):active,
 .btn-primary:not(:disabled):not(.disabled).active,
@@ -89,6 +108,23 @@ nav.navbar.navbar-expand-lg a.dropdown-item
 .btn-secondary
   color: $white !important
 
+.btn-default
+  color: rgba($white, .5)
+  background-color: transparent
+  border: 1px solid rgba($white, .5)
+  &:hover,
+  &:focus
+    color: rgba($white, .5)
+    background-color: rgba($white, .5)
+    border-color: rgba($white, .5)
+
+.dropdown-item
+  color: $white
+  &:hover,
+  &:focus
+    color: $white
+    background-color: rgba($white, .1)
+
 .dropdown-item.active, .dropdown-item:active
   color: #fff
   background-color: $btn-primary-bg
@@ -101,24 +137,54 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6
   font-weight: 600
 
 h1, h2, h3, .h2, h3
-  font-family: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+  font-family: $font-display
+
+h2
+  &::after
+    content: ""
+    display: block
+    height: 16px
+    margin-top: 1.75rem
+    margin-bottom: 2.5rem
+    background-image: repeating-linear-gradient(-45deg, $white 0, $white 10px, transparent 10px, transparent 18px)
 
 .form-group
+  margin-bottom: 1.75rem
   label
     font-weight: 600
+
+.form-text
+  margin-top: 0.75rem
+
+.form-check-input:disabled ~ .form-check-label,
+.form-check-input[disabled] ~ .form-check-label
+  color: rgba($white, .4)
 
 .alert-info
   a:not(.btn)
     color: $color_pink
 
 .card
-  color: $black
-  a:not(.btn)
-    color: $color_pink
+  background-color: $color-bg-card
+  color: $white
+  border: 1px solid $color-line
+  border-radius: 16px
+  overflow: hidden
+  .card-text a:not(.btn)
+    color: $link
+    &:hover,
+    &:focus
+      color: $link-hover
+  .list-group-item
+    padding: 1.5rem 1.25rem
+    background-color: transparent
+    border-color: $color-line
+    color: inherit
 
 .breadcrumb
   background-color: $color-bg-card
   border: 1px solid $color-line
+  margin-bottom: 2rem
   a:not(.btn)
     color: $color_pink
 
@@ -132,3 +198,8 @@ h1, h2, h3, .h2, h3
 
 .plan-table
   color: $white
+
+.card-header
+  background-color: rgba($white, .1)
+  border-bottom: 1px solid $color-line
+  font-weight: 600

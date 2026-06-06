@@ -1,12 +1,12 @@
 - content_for(:title) { t('.title') }
 
-%h1 Listing conferences
+%h2 Listing conferences
 
-= link_to 'New', new_conference_path, class: 'btn btn-default'
-
-.row.py-2
+.row.py-5
   - @conferences.each do |conference|
     .col-md-6
       .card
         .card-body
           = link_to conference.name, conference
+
+= link_to 'New', new_conference_path, class: 'btn btn-default'

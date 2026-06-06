@@ -1,6 +1,10 @@
 // breakpoints
 $media-breakpoints: (xs: 0, se: 320px, sm: 576px, md: 768px, lg: 1024px, xl: 1400px)
 
+// fonts
+$font-display: "Funnel Display", sans-serif
+$font-body: "IBM Plex Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif
+
 // colors
 $black: #000
 $white: #FFF
@@ -63,16 +67,30 @@ $accent-color-border: $color-accent
 
 // navbar
 $nav-link: $color-main
-$nav-link-hover: $color-main-light
+$nav-link-hover: $color_green
 $nav-bg: $white
 $nav-shadow: 0px 2px 2px rgba(0, 0, 0, 0.07)
 $nav-toggler-border: transparent
 
 // button
-$btn-primary-bg: $color-accent
+$btn-padding-y: 0.6rem
+$btn-padding-x: 1.5rem
+$btn-sm-padding-y: 0.4rem
+$btn-sm-padding-x: 1rem
+$btn-primary-bg: $color_green
 $btn-primary-border: transparent
-$btn-primary-bg-hover: darken($color_pink, 15%)
+$btn-primary-bg-hover: darken($color_green, 12%)
 $btn-primary-border-hover: transparent
+
+// form
+$form-control-padding-y: $btn-padding-y
+$form-control-padding-x: $btn-padding-x / 2
+$form-control-bg: $black
+$form-control-color: $white
+$form-control-border: rgba($white, .3)
+$form-control-placeholder: rgba($white, .25)
+$form-control-focus-bg: $white
+$form-control-focus-color: #495057
 
 // schedule
 $break: #e0e0cf

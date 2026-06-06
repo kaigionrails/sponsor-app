@@ -13,12 +13,12 @@
 .row.py-2
   .col-md-12
     - if @broadcast_deliveries.empty?
-      .card.text-dark
+      .card
         .card-body
           %p.text-muted= t('.empty')
     - else
       - @broadcast_deliveries.each do |delivery|
-        .card.text-dark.mb-3{id: "broadcast-#{delivery.broadcast.id}"}
+        .card.mb-3{id: "broadcast-#{delivery.broadcast.id}"}
           .card-header
             %strong= delivery.broadcast.title
             %small.text-muted.ml-2= l(delivery.broadcast.dispatched_at || delivery.broadcast.created_at , format: :short)

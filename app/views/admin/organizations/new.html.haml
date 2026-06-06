@@ -6,7 +6,7 @@
     %li.breadcrumb-item= link_to 'Organizations', organizations_path
     %li.breadcrumb-item.active{aria: {current: 'page'}} New
 
-%h1 New Organization
+%h2 New Organization
 
 = form_with(model: @organization, url: organizations_path, local: true) do |form|
   - if @organization.errors.any?
