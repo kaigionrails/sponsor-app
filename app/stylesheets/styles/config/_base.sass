@@ -120,6 +120,15 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6
 h1, h2, h3, .h2, h3
   font-family: $font-display
 
+h2
+  &::after
+    content: ""
+    display: block
+    height: 16px
+    margin-top: 1.25rem
+    margin-bottom: 2.5rem
+    background-image: repeating-linear-gradient(-45deg, $white 0, $white 10px, transparent 10px, transparent 18px)
+
 .form-group
   label
     font-weight: 600
