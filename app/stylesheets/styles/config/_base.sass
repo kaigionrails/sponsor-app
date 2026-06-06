@@ -199,6 +199,30 @@ h2
 .plan-table
   color: $white
 
+.table
+  color: $white
+  th, td
+    padding: 0.75rem 1.25rem
+    border-top-color: $color-line
+    vertical-align: middle
+  thead th
+    background-color: rgba($white, .08)
+    border-bottom-color: $color-line
+    color: $white
+    font-weight: 600
+  a:not(.btn)
+    color: $link
+    &:hover,
+    &:focus
+      color: $link-hover
+
+.table-hover tbody tr:hover
+  color: $white
+  background-color: rgba($white, .06)
+
+.table-striped tbody tr:nth-of-type(odd)
+  background-color: rgba($white, .03)
+
 .card-header
   background-color: rgba($white, .1)
   border-bottom: 1px solid $color-line
