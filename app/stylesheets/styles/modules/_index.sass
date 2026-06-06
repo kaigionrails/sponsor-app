@@ -28,12 +28,17 @@ body.root .container
   padding: 0
 
 .portal-logo
-  width: 320px
+  width: clamp(180px, 60vw, 320px)
   height: auto
 
 .portal-title-sub
   margin-left: 0.4em
   font-weight: 300
+
+// トップページの h1 は小画面で縮める
+body.root h1
+  +breakpoint-down(sm)
+    font-size: 1.75rem
 
 // トップ2カラムのカード間 gap を広げる
 .portal-columns
@@ -43,6 +48,10 @@ body.root .container
     > [class*="col-"]
       padding-left: 24px
       padding-right: 24px
+  // md 未満は縦積み。カード間に呼吸を入れる
+  +breakpoint-down(md)
+    > [class*="col-"] + [class*="col-"]
+      margin-top: 1.5rem
 
 .portal-card
   background-color: rgba($black, .5)
