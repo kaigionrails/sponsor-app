@@ -148,6 +148,12 @@ h2
     margin-bottom: 2.5rem
     background-image: repeating-linear-gradient(-45deg, $white 0, $white 10px, transparent 10px, transparent 18px)
 
+// .list-group-item 内の h2 では装飾線を出さない
+.list-group-item h2
+  margin-bottom: 1.25rem
+  &::after
+    content: none
+
 .form-group
   margin-bottom: 1.75rem
   label
