@@ -6,12 +6,12 @@
     %li.breadcrumb-item Sponsorships
     %li.breadcrumb-item.active{aria: {current: 'page'}}= @sponsorship.name
 
-.d-md-flex.justify-content-between
-  %h3 #{@sponsorship.name}
-  %div
-    = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
-    = link_to "History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
-    =# link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address, cc: @sponsorship.contact.email_ccs), class: 'btn btn-info', target: '_blank'
+%h2= @sponsorship.name
+
+.mb-4
+  = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
+  = link_to "History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
+  =# link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address, cc: @sponsorship.contact.email_ccs), class: 'btn btn-info', target: '_blank'
 
 .row
   .col-md-8
@@ -137,7 +137,7 @@
                     = link_to "Exhibitor", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
                   - if @sponsorship.tito_booth_paid_discount_code
                     = link_to "Exhibitor (Paid)", @sponsorship.tito_booth_paid_discount_code.dashboard_orders_url
-        .card
+        .card.mt-2
           %h5.card-header
             Requests
           .card-body
@@ -237,7 +237,7 @@
     .card
       .card-header.d-flex.justify-content-between
         %h5.my-auto Notes
-        = link_to "Show All", conference_sponsorship_staff_notes_path(@conference, @sponsorship), class: 'btn btn-default small'
+        = link_to "Show All", conference_sponsorship_staff_notes_path(@conference, @sponsorship), class: 'btn btn-default btn-sm'
       %ul.list-group.list-group-flush
         %li.list-group-item
           = render 'admin/sponsorship_staff_notes/form', staff_note: @new_staff_note
