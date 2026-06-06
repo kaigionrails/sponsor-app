@@ -144,6 +144,10 @@ h2
 .form-text
   margin-top: 0.75rem
 
+.form-check-input:disabled ~ .form-check-label,
+.form-check-input[disabled] ~ .form-check-label
+  color: rgba($white, .4)
+
 .alert-info
   a:not(.btn)
     color: $color_pink
