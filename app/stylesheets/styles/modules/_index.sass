@@ -5,13 +5,20 @@ body
   background-repeat: repeat-x
 
 .form-control
-  border-color: $whitegrey
-  background-color: rgba($white, .7)
-  color: $black
+  padding: $form-control-padding-y $form-control-padding-x
+  height: auto
+  border-color: $form-control-border
+  background-color: $form-control-bg
+  color: $form-control-color
+  &::placeholder
+    color: $form-control-placeholder
+  &:focus
+    background-color: $form-control-focus-bg
+    color: $form-control-focus-color
 
 .container
   margin: 48px auto
-  background-color: rgba($black, .5)
+  background-color: rgba($black, .3)
   padding: 32px
   border-radius: 16px
 
