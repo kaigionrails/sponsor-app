@@ -89,6 +89,8 @@
 
                 - if sponsorship.exhibitor?
                   %span.badge.badge-info Booth
+                - if sponsorship.print_sticker_sponsor_requested?
+                  %span.badge.badge-warning print requested
                 - if sponsorship.customization_planned?
                   %span.badge.badge-warning Custom Plan: Tentative
                 - if !sponsorship.accepted?
