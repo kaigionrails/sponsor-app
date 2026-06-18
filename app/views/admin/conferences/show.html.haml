@@ -75,7 +75,12 @@
       .card-body
         .mb-4
           = link_to "Generate YAML", sponsors_yml_conference_path(), class: 'btn btn-secondary'
-        - @conference.sponsorships.where(withdrawn_at: nil).includes(:plan).order(id: :asc).group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
+        - sponsorships = @conference.sponsorships.where(withdrawn_at: nil).includes(:plan).order(id: :asc).to_a
+        %p
+          ブースリクエスト数 #{sponsorships.count(&:booth_requested?)}
+          %br
+          プリクラ希望数 #{sponsorships.count(&:print_sticker_sponsor_requested?)}
+        - sponsorships.group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
           %h6
             = plan&.name || 'Undetermined'
             %span (#{sponsorships.size}/#{plan&.capacity})
