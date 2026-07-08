@@ -17,22 +17,27 @@
     .form-group
       = select_tag "recipient_filter[plan_id]", options_from_collection_for_select(@conference.plans, 'id', 'name'), class: 'form-control', include_blank: true
     .form-group
-      .form-check
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'all', true, {class: 'form-check-input'}
           All
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'pending', false, {class: 'form-check-input'}
           Pending
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'active', false, {class: 'form-check-input'}
           Active
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'not_accepted', false, {class: 'form-check-input'}
           Not accepted (incl. withdrawn)
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'accepted', false, {class: 'form-check-input'}
           Accepted (incl. withdrawn)
+      .form-check-inline
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'withdrawn', false, {class: 'form-check-input'}
           Withdrawn

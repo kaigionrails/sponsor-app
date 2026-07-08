@@ -3,6 +3,7 @@ import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from 
 import { updateLineItem, deleteLineItem, createLineItem } from "./api";
 import { DropZoneIndicator } from "./FileDropOverlay";
 import { useI18n, splitAt } from "./I18nContext";
+import { formatAmount } from "./format";
 
 type LineItemFormProps = {
   item: ExpenseLineItem;
@@ -348,6 +349,21 @@ export function LineItemForm({
           </div>
         )}
       </div>
+
+      {(() => {
+        const { netAmount, taxAmt } = deriveAmounts();
+        // Sum in the smallest unit to avoid binary float drift
+        // (e.g. 0.1 + 0.2 = 0.30000000000000004).
+        const totalUnits =
+          Math.round((parseFloat(netAmount) || 0) * factor) +
+          Math.round((parseFloat(taxAmt) || 0) * factor);
+        const total = (totalUnits / factor).toFixed(decimal);
+        return (
+          <div className="small text-muted mb-2">
+            {i18n.total_incl_label}: {formatAmount(total, decimal)}
+          </div>
+        );
+      })()}
 
       <div className="form-group form-check">
         <input
