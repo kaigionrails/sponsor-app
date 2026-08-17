@@ -14,6 +14,7 @@ class Broadcast < ApplicationRecord
   validates :status, presence: true
   validates :title, presence: true
   validates :body, presence: true
+  validate :forbid_changes_to_delivered_content, if: -> { persisted? && status_was == 'sent' }
 
   def perform_later!(now: Time.current)
     update!(status: :pending, dispatched_at: now)
@@ -36,5 +37,10 @@ class Broadcast < ApplicationRecord
       :sending
     end
     self
+  end
+
+  private def forbid_changes_to_delivered_content
+    errors.add(:title, 'cannot be changed after dispatch') if title_changed?
+    errors.add(:body, 'cannot be changed after dispatch') if body_changed?
   end
 end
