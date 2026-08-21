@@ -25,6 +25,16 @@ RSpec.describe "Admin Conference Billing", type: :request do
     expect(invoice_row.values_at(15, 16, 17)).to eq([nil, nil, nil])
   end
 
+  it 'uses the booth price configured on the plan' do
+    plan.update!(price_booth: 50_000)
+    FactoryBot.create(:sponsorship, conference:, plan:, booth_assigned: true, accepted_at: Time.current)
+
+    get billing_conference_path(conference, format: :csv)
+
+    booth_item = CSV.parse(response.body).find { |row| row[29]&.include?('ブース出展') }
+    expect(booth_item.values_at(31, 36)).to eq(%w[50000.0 50000.0])
+  end
+
   private def invoice_row
     CSV.parse(response.body).find { |row| row[1] == '請求書' }
   end
