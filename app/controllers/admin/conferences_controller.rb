@@ -2,7 +2,7 @@
 
 module Admin
   class ConferencesController < Admin::ApplicationController
-    TAX_RATE = 0.1
+    TAX_RATE = BigDecimal('0.1')
 
     before_action :require_unrestricted_staff, only: [:index, :new, :create]
     before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view, :billing]
@@ -49,16 +49,17 @@ module Admin
       sponsorships = @conference.sponsorships.active.includes_contacts.includes(:plan).order(:plan_id, :id)
 
       sponsorships.each.with_index(1) do |sponsor, i|
-        subtotal = sponsor.plan.price
-        subtotal += sponsor.plan.price_booth if sponsor.booth_assigned
-        tax = (subtotal * TAX_RATE).to_i
+        plan_amount = amount_in_yen(sponsor.plan.price)
+        booth_amount = sponsor.booth_assigned ? amount_in_yen(sponsor.plan.price_booth) : 0
+        subtotal = plan_amount + booth_amount
+        tax = (subtotal * TAX_RATE).floor
 
         @billings << [40101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'), "#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name, nil, subtotal, tax, subtotal + tax, '御中', nil, nil, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
 
-        @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, sponsor.plan.price, 1, nil, nil, nil, sponsor.plan.price, '10%']
+        @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, plan_amount, 1, nil, nil, nil, plan_amount, '10%']
 
         if sponsor.booth_assigned
-          @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (ブース出展)", nil, sponsor.plan.price_booth, 1, nil, nil, nil, sponsor.plan.price_booth, '10%']
+          @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (ブース出展)", nil, booth_amount, 1, nil, nil, nil, booth_amount, '10%']
         end
       end
 
@@ -151,6 +152,10 @@ module Admin
         :no_plan_allowed,
         :allow_restricted_access,
       )
+    end
+
+    private def amount_in_yen(amount)
+      amount.to_d.round(0, BigDecimal::ROUND_HALF_UP).to_i
     end
   end
 end

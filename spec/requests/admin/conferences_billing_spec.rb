@@ -32,7 +32,17 @@ RSpec.describe "Admin Conference Billing", type: :request do
     get billing_conference_path(conference, format: :csv)
 
     booth_item = CSV.parse(response.body).find { |row| row[29]&.include?('ブース出展') }
-    expect(booth_item.values_at(31, 36)).to eq(%w[50000.0 50000.0])
+    expect(booth_item.values_at(31, 36)).to eq(%w[50000 50000])
+  end
+
+  it 'rounds item amounts to whole yen before calculating invoice tax' do
+    plan.update!(price: BigDecimal('300000.5'))
+
+    get billing_conference_path(conference, format: :csv)
+
+    plan_item = CSV.parse(response.body).find { |row| row[1] == '品目' }
+    expect(invoice_row.values_at(10, 11, 12)).to eq(%w[300001 30000 330001])
+    expect(plan_item.values_at(31, 36)).to eq(%w[300001 300001])
   end
 
   private def invoice_row
