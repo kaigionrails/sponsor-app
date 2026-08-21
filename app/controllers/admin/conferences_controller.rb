@@ -54,7 +54,7 @@ module Admin
         subtotal += booth_price if sponsor.booth_assigned
         tax = (subtotal * TAX_RATE).to_i
 
-        @billings << [40101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'), "#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name, nil, subtotal, tax, subtotal + tax, sponsor.billing_contact.organization, nil, sponsor.billing_contact.address, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
+        @billings << [40101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'), "#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name, nil, subtotal, tax, subtotal + tax, '御中', nil, sponsor.billing_contact.address, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
 
         @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, sponsor.plan.price, 1, nil, nil, nil, sponsor.plan.price, '10%']
 
