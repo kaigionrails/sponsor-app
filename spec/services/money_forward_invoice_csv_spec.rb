@@ -8,6 +8,7 @@ RSpec.describe MoneyForwardInvoiceCsv do
       conference:,
       sponsorships: [sponsorship],
       invoice_date: Date.new(2026, 8, 16),
+      delivery_date: Date.new(2026, 10, 3),
     )
   end
 
@@ -47,8 +48,8 @@ RSpec.describe MoneyForwardInvoiceCsv do
     it 'builds the plan and booth item values' do
       plan_item, booth_item = invoice_csv.rows.values_at(2, 3)
 
-      expect(plan_item.values_at(0, 1, 29, 31, 32, 36, 37)).to eq([40_101, '品目', 'Kaigi on Rails 2026 協賛費用 (Rubyプラン)', 300_000, 1, 300_000, '10%'])
-      expect(booth_item.values_at(0, 1, 29, 31, 32, 36, 37)).to eq([40_101, '品目', 'Kaigi on Rails 2026 協賛費用 (ブース出展)', 50_000, 1, 50_000, '10%'])
+      expect(plan_item.values_at(0, 1, 28, 29, 31, 32, 36, 37)).to eq([40_101, '品目', '2026/10/03', 'Kaigi on Rails 2026 協賛費用 (Rubyプラン)', 300_000, 1, 300_000, '10%'])
+      expect(booth_item.values_at(0, 1, 28, 29, 31, 32, 36, 37)).to eq([40_101, '品目', '2026/10/03', 'Kaigi on Rails 2026 協賛費用 (ブース出展)', 50_000, 1, 50_000, '10%'])
     end
 
     context 'without a booth' do
@@ -173,6 +174,7 @@ RSpec.describe MoneyForwardInvoiceCsv do
         conference:,
         sponsorships: [sponsorship],
         invoice_date: Date.new(2026, 8, 16),
+        delivery_date: Date.new(2026, 10, 3),
         starting_invoice_number: 42,
       )
     end

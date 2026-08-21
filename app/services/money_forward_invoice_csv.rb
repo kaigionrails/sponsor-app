@@ -46,10 +46,11 @@ class MoneyForwardInvoiceCsv
     item_tax_rate: '品目消費税率',
   }.freeze
 
-  def initialize(conference:, sponsorships:, invoice_date:, starting_invoice_number: 1)
+  def initialize(conference:, sponsorships:, invoice_date:, delivery_date:, starting_invoice_number: 1)
     @conference = conference
     @sponsorships = sponsorships
     @invoice_date = invoice_date
+    @delivery_date = delivery_date
     @starting_invoice_number = starting_invoice_number
   end
 
@@ -67,7 +68,7 @@ class MoneyForwardInvoiceCsv
     end
   end
 
-  private attr_reader :conference, :sponsorships, :invoice_date, :starting_invoice_number
+  private attr_reader :conference, :sponsorships, :invoice_date, :delivery_date, :starting_invoice_number
 
   private def build_rows(selected_sponsorships, assign_invoice_numbers:)
     [COLUMNS.values] + selected_sponsorships.each_with_index.flat_map do |sponsorship, index|
@@ -162,6 +163,7 @@ class MoneyForwardInvoiceCsv
     build_row(
       csv_type: CSV_TYPE,
       row_type: '品目',
+      delivery_date: formatted_delivery_date,
       item_name: name,
       unit_price: price,
       quantity: 1,
@@ -180,6 +182,10 @@ class MoneyForwardInvoiceCsv
 
   private def formatted_invoice_date
     invoice_date.strftime('%Y/%m/%d')
+  end
+
+  private def formatted_delivery_date
+    delivery_date&.strftime('%Y/%m/%d')
   end
 
   private def formatted_invoice_number(invoice_number)
