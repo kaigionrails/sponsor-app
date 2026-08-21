@@ -2,10 +2,8 @@
 
 module Admin
   class ConferencesController < Admin::ApplicationController
-    TAX_RATE = BigDecimal('0.1')
-
     before_action :require_unrestricted_staff, only: [:index, :new, :create]
-    before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view, :billing]
+    before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
     def index
       @conferences = Conference.all
@@ -36,47 +34,6 @@ module Admin
       @sponsorships = @conference.sponsorships
         .includes_contacts
         .includes_requests
-    end
-
-    # https://biz.moneyforward.com/support/invoice/faq/invoice/invoice002.html
-    def billing
-      @billings = []
-
-      @billings << %w[csv_type(変更不可) 行形式 取引先名称 件名 請求日 お支払期限 請求書番号 売上計上日 メモ タグ 小計 消費税 合計金額 取引先敬称 取引先郵便番号 取引先都道府県 取引先住所1 取引先住所2 取引先部署 取引先担当者役職 取引先担当者氏名 自社担当者氏名 備考 振込先 入金ステータス メール送信ステータス 郵送ステータス ダウンロードステータス 納品日 品名 品目コード 単価 数量 単位 納品書番号 詳細 金額 品目消費税率]
-
-      billing_day = params[:billing_day] ? Date.parse(params[:billing_day]) : Time.zone.today
-
-      sponsorships = @conference.sponsorships.active.includes_contacts.includes(:plan).order(:plan_id, :id)
-
-      sponsorships.each.with_index(1) do |sponsor, i|
-        plan_amount = amount_in_yen(sponsor.plan.price)
-        booth_amount = sponsor.booth_assigned ? amount_in_yen(sponsor.plan.price_booth) : 0
-        subtotal = plan_amount + booth_amount
-        tax = (subtotal * TAX_RATE).floor
-
-        @billings << [40101, '請求書', sponsor.billing_contact.organization, "#{@conference.name} 協賛のご請求", billing_day.strftime('%Y/%m/%d'), (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'), "#{billing_day.strftime("%Y%m%d")}-#{format("%03<number>d", number: i)}", billing_day.strftime('%Y/%m/%d'), sponsor.plan.name, nil, subtotal, tax, subtotal + tax, '御中', nil, nil, nil, nil, sponsor.billing_contact.unit, '', sponsor.billing_contact.name, nil, '払込手数料は、御社のご負担とさせていただきます。'] + Array.new(12)
-
-        @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (#{sponsor.plan.name})", nil, plan_amount, 1, nil, nil, nil, plan_amount, '10%']
-
-        if sponsor.booth_assigned
-          @billings << [40101, '品目'] + Array.new(27) + ["#{@conference.name} 協賛費用 (ブース出展)", nil, booth_amount, 1, nil, nil, nil, booth_amount, '10%']
-        end
-      end
-
-      respond_to do |format|
-        format.html do
-          render :billing
-        end
-        format.csv do
-          billing_csv = CSV.generate(row_sep: "\r\n") do |csv|
-            @billings.each do |billing|
-              csv << billing
-            end
-          end
-
-          send_data(billing_csv, filename: "#{@conference.name.underscore.gsub(" ", "_")}_billing.csv")
-        end
-      end
     end
 
     def asset_urls
@@ -152,10 +109,6 @@ module Admin
         :no_plan_allowed,
         :allow_restricted_access,
       )
-    end
-
-    private def amount_in_yen(amount)
-      amount.to_d.round(0, BigDecimal::ROUND_HALF_UP).to_i
     end
   end
 end
