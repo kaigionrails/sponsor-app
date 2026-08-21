@@ -6,9 +6,9 @@ module Admin
 
     # https://biz.moneyforward.com/support/invoice/faq/invoice/invoice002.html
     def index
-      billing_day = params[:billing_day].present? ? Date.parse(params[:billing_day]) : Time.zone.today
+      @invoice_date = params[:invoice_date].present? ? Date.parse(params[:invoice_date]) : Time.zone.today
       sponsorships = @conference.sponsorships.active.includes_contacts.includes(:plan).order(:plan_id, :id)
-      invoice_csv = MoneyForwardInvoiceCsv.new(conference: @conference, sponsorships:, billing_day:)
+      invoice_csv = MoneyForwardInvoiceCsv.new(conference: @conference, sponsorships:, invoice_date: @invoice_date)
 
       respond_to do |format|
         format.html { @invoice_rows = invoice_csv.rows }

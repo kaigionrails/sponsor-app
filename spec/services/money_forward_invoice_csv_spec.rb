@@ -7,7 +7,7 @@ RSpec.describe MoneyForwardInvoiceCsv do
     described_class.new(
       conference:,
       sponsorships: [sponsorship],
-      billing_day: Date.new(2026, 8, 16),
+      invoice_date: Date.new(2026, 8, 16),
     )
   end
 

@@ -46,10 +46,10 @@ class MoneyForwardInvoiceCsv
     item_tax_rate: '品目消費税率',
   }.freeze
 
-  def initialize(conference:, sponsorships:, billing_day:)
+  def initialize(conference:, sponsorships:, invoice_date:)
     @conference = conference
     @sponsorships = sponsorships
-    @billing_day = billing_day
+    @invoice_date = invoice_date
   end
 
   def rows
@@ -64,7 +64,7 @@ class MoneyForwardInvoiceCsv
     end
   end
 
-  private attr_reader :conference, :sponsorships, :billing_day
+  private attr_reader :conference, :sponsorships, :invoice_date
 
   private def sponsorship_rows(sponsorship, invoice_number)
     rows = [invoice_row(sponsorship, invoice_number), plan_item_row(sponsorship)]
@@ -82,10 +82,10 @@ class MoneyForwardInvoiceCsv
       row_type: '請求書',
       customer_name: contact.organization,
       subject: "#{conference.name} 協賛のご請求",
-      billing_date: formatted_billing_day,
-      due_date: (billing_day + 1.month).end_of_month.strftime('%Y/%m/%d'),
-      invoice_number: "#{billing_day.strftime("%Y%m%d")}-#{format("%03d", invoice_number)}",
-      sales_date: formatted_billing_day,
+      billing_date: formatted_invoice_date,
+      due_date: (invoice_date + 1.month).end_of_month.strftime('%Y/%m/%d'),
+      invoice_number: "#{invoice_date.strftime("%Y%m%d")}-#{format("%03d", invoice_number)}",
+      sales_date: formatted_invoice_date,
       memo: sponsorship.plan.name,
       subtotal:,
       tax:,
@@ -140,7 +140,7 @@ class MoneyForwardInvoiceCsv
     COLUMNS.keys.map { |column| values[column] }
   end
 
-  private def formatted_billing_day
-    billing_day.strftime('%Y/%m/%d')
+  private def formatted_invoice_date
+    invoice_date.strftime('%Y/%m/%d')
   end
 end
