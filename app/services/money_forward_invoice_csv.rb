@@ -53,9 +53,11 @@ class MoneyForwardInvoiceCsv
   end
 
   def rows
-    @rows ||= [COLUMNS.values] + sponsorships.each_with_index.flat_map do |sponsorship, index|
-      sponsorship_rows(sponsorship, index + 1)
-    end
+    @rows ||= build_rows(exportable_sponsorships, assign_invoice_numbers: true)
+  end
+
+  def excluded_rows
+    @excluded_rows ||= build_rows(excluded_sponsorships, assign_invoice_numbers: false)
   end
 
   def to_csv
@@ -66,15 +68,35 @@ class MoneyForwardInvoiceCsv
 
   private attr_reader :conference, :sponsorships, :invoice_date
 
+  private def build_rows(selected_sponsorships, assign_invoice_numbers:)
+    [COLUMNS.values] + selected_sponsorships.each_with_index.flat_map do |sponsorship, index|
+      invoice_number = index + 1 if assign_invoice_numbers
+      sponsorship_rows(sponsorship, invoice_number)
+    end
+  end
+
+  private def exportable_sponsorships
+    sponsorships_by_invoice_sign.first
+  end
+
+  private def excluded_sponsorships
+    sponsorships_by_invoice_sign.last
+  end
+
+  private def sponsorships_by_invoice_sign
+    @sponsorships_by_invoice_sign ||= sponsorships.partition { |sponsorship| invoice_subtotal(sponsorship) >= 0 }
+  end
+
   private def sponsorship_rows(sponsorship, invoice_number)
     rows = [invoice_row(sponsorship, invoice_number), plan_item_row(sponsorship)]
     rows << booth_item_row(sponsorship) if sponsorship.booth_assigned
+    rows << custom_sponsorship_item_row(sponsorship) if approved_expense_amount_in_yen(sponsorship).positive?
     rows
   end
 
   private def invoice_row(sponsorship, invoice_number)
     contact = sponsorship.billing_contact
-    subtotal = plan_amount(sponsorship) + booth_amount(sponsorship)
+    subtotal = invoice_subtotal(sponsorship)
     tax = (subtotal * TAX_RATE).floor
 
     build_row(
@@ -84,7 +106,7 @@ class MoneyForwardInvoiceCsv
       subject: "#{conference.name} 協賛のご請求",
       billing_date: formatted_invoice_date,
       due_date: (invoice_date + 1.month).end_of_month.strftime('%Y/%m/%d'),
-      invoice_number: "#{invoice_date.strftime("%Y%m%d")}-#{format("%03d", invoice_number)}",
+      invoice_number: formatted_invoice_number(invoice_number),
       sales_date: formatted_invoice_date,
       memo: sponsorship.plan.name,
       subtotal:,
@@ -104,6 +126,21 @@ class MoneyForwardInvoiceCsv
 
   private def booth_item_row(sponsorship)
     item_row("#{conference.name} 協賛費用 (ブース出展)", booth_amount(sponsorship))
+  end
+
+  private def custom_sponsorship_item_row(sponsorship)
+    item_row('カスタムスポンサー費用分', -approved_expense_amount_in_yen(sponsorship))
+  end
+
+  private def approved_expense_amount_in_yen(sponsorship)
+    report = sponsorship.expense_report
+    return 0 unless sponsorship.customization && report&.status == 'approved'
+
+    amount_in_yen(report.total_amount || 0)
+  end
+
+  private def invoice_subtotal(sponsorship)
+    plan_amount(sponsorship) + booth_amount(sponsorship) - approved_expense_amount_in_yen(sponsorship)
   end
 
   private def plan_amount(sponsorship)
@@ -142,5 +179,9 @@ class MoneyForwardInvoiceCsv
 
   private def formatted_invoice_date
     invoice_date.strftime('%Y/%m/%d')
+  end
+
+  private def formatted_invoice_number(invoice_number)
+    "#{invoice_date.strftime("%Y%m%d")}-#{format("%03d", invoice_number)}" if invoice_number
   end
 end
