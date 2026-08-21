@@ -19,6 +19,12 @@ RSpec.describe "Admin Conference Billing", type: :request do
     expect(invoice_row.fetch(13)).to eq('御中')
   end
 
+  it 'leaves the customer address fields blank' do
+    get billing_conference_path(conference, format: :csv)
+
+    expect(invoice_row.values_at(15, 16, 17)).to eq([nil, nil, nil])
+  end
+
   private def invoice_row
     CSV.parse(response.body).find { |row| row[1] == '請求書' }
   end
