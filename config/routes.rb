@@ -16,10 +16,10 @@ Rails.application.routes.draw do
         get :sponsors_json
         get :asset_urls
         get :table_view
-        get :billing
       end
 
       resource :booth_assignment, only: %i(show update)
+      resources :invoices, only: %i(index)
 
       resources :form_descriptions, param: :locale, except: %i(index)
       resources :plans, except: %i(show)
