@@ -17,7 +17,7 @@ class SponsorshipWelcomeJob < ApplicationJob
       {text: ":tamago: *New sponsorship* (#{sponsorship.plan_name || "*OTHER*"}): #{sponsorship.name}  <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|Open>"},
     )
 
-    # EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
+    EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
     # GenerateSponsorsYamlFileJob.perform_later(sponsorship.conference)
 
     BackfillSponsorshipAssetFileChecksumJob.perform_later(sponsorship.asset_file) if sponsorship.asset_file.checksum_sha256 == '-'
