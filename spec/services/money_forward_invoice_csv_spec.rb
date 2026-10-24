@@ -6,12 +6,13 @@ RSpec.describe MoneyForwardInvoiceCsv do
   subject(:invoice_csv) do
     described_class.new(
       conference:,
-      sponsorships: [sponsorship],
+      sponsorships:,
       invoice_date: Date.new(2026, 8, 16),
       delivery_date: Date.new(2026, 10, 3),
     )
   end
 
+  let(:sponsorships) { [sponsorship] }
   let(:conference) { instance_double(Conference, name: 'Kaigi on Rails 2026') }
   let(:contact) do
     instance_double(
@@ -33,7 +34,13 @@ RSpec.describe MoneyForwardInvoiceCsv do
 
       expect(rows.size).to eq(4)
       expect(rows.map(&:size).uniq).to eq([38])
-      expect(rows.first).to eq(described_class::COLUMNS.values)
+      expect(rows.first).to eq([
+        'csv_type(変更不可)', '行形式', '取引先名称', '件名', '請求日', 'お支払期限', '請求書番号', '売上計上日',
+        'メモ', 'タグ', '小計', '消費税', '合計金額', '取引先敬称', '取引先郵便番号', '取引先都道府県',
+        '取引先住所1', '取引先住所2', '取引先部署', '取引先担当者役職', '取引先担当者氏名', '自社担当者氏名',
+        '備考', '振込先', '入金ステータス', 'メール送信ステータス', '郵送ステータス', 'ダウンロードステータス',
+        '納品日', '品名', '品目コード', '単価', '数量', '単位', '納品書番号', '詳細', '金額', '品目消費税率',
+      ])
     end
 
     it 'builds the invoice values' do
@@ -153,7 +160,8 @@ RSpec.describe MoneyForwardInvoiceCsv do
 
   describe '#to_csv' do
     it 'uses CRLF line endings required by the import format' do
-      expect(invoice_csv.to_csv).to include("\r\n")
+      expect(invoice_csv.to_csv).to end_with("\r\n")
+      expect(invoice_csv.to_csv.gsub("\r\n", "")).not_to include("\n", "\r")
     end
 
     context 'with a negative invoice' do
@@ -168,11 +176,33 @@ RSpec.describe MoneyForwardInvoiceCsv do
     end
   end
 
+  context 'with no sponsorships' do
+    let(:sponsorships) { [] }
+
+    it 'exports only the header' do
+      expect(invoice_csv).not_to be_exportable
+      expect(CSV.parse(invoice_csv.to_csv)).to eq([described_class::COLUMNS.values])
+    end
+  end
+
+  context 'with an excluded invoice between exportable invoices' do
+    let(:expense_report) { instance_double(ExpenseReport, status: 'approved', total_amount: 400_000) }
+    let(:excluded_sponsorship) do
+      instance_double(Sponsorship, billing_contact: contact, plan:, booth_assigned: false, customization: true, expense_report:)
+    end
+    let(:sponsorships) { [sponsorship, excluded_sponsorship, sponsorship] }
+
+    it 'numbers only exported invoices and leaves excluded numbers blank' do
+      expect(invoice_csv.rows.values_at(1, 4).map { |row| row.fetch(6) }).to eq(['20260816-001', '20260816-002'])
+      expect(invoice_csv.excluded_rows.fetch(1).fetch(6)).to be_nil
+    end
+  end
+
   context 'with a specified starting invoice number' do
     subject(:invoice_csv) do
       described_class.new(
         conference:,
-        sponsorships: [sponsorship],
+        sponsorships:,
         invoice_date: Date.new(2026, 8, 16),
         delivery_date: Date.new(2026, 10, 3),
         starting_invoice_number: 42,
