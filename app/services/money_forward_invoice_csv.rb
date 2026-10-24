@@ -53,12 +53,18 @@ class MoneyForwardInvoiceCsv
     @starting_invoice_number = starting_invoice_number
   end
 
+  def headers
+    COLUMNS.values
+  end
+
   def rows
-    @rows ||= build_rows(exportable_invoices, assign_invoice_numbers: true)
+    @rows ||= exportable_invoices.each_with_index.flat_map do |invoice, index|
+      invoice_rows(invoice, starting_invoice_number + index)
+    end
   end
 
   def excluded_rows
-    @excluded_rows ||= build_rows(excluded_invoices, assign_invoice_numbers: false)
+    @excluded_rows ||= excluded_invoices.flat_map { |invoice| invoice_rows(invoice, nil) }
   end
 
   def exportable?
@@ -67,18 +73,12 @@ class MoneyForwardInvoiceCsv
 
   def to_csv
     CSV.generate(row_sep: "\r\n") do |csv|
+      csv << headers
       rows.each { |row| csv << row }
     end
   end
 
   private attr_reader :conference, :sponsorships, :invoice_date, :delivery_date, :starting_invoice_number
-
-  private def build_rows(selected_invoices, assign_invoice_numbers:)
-    [COLUMNS.values] + selected_invoices.each_with_index.flat_map do |invoice, index|
-      invoice_number = starting_invoice_number + index if assign_invoice_numbers
-      invoice_rows(invoice, invoice_number)
-    end
-  end
 
   private def exportable_invoices
     invoices_by_sign.first

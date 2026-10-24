@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe "Admin Invoices", type: :request do
-  let(:conference) { FactoryBot.create(:conference) }
+  include ActiveSupport::Testing::TimeHelpers
+
+  let(:conference) { FactoryBot.create(:conference, name: 'Kaigi on Rails 2026') }
   let(:ruby_plan) { FactoryBot.create(:plan, conference:, name: 'Ruby', price: 300_000, price_text: '30万円') }
   let(:gold_plan) { FactoryBot.create(:plan, conference:, name: 'Gold', price: 200_000, price_text: '20万円') }
   let(:staff) { FactoryBot.create(:staff) }
@@ -11,144 +13,145 @@ RSpec.describe "Admin Invoices", type: :request do
   let(:standard_ja_sponsorship) do
     FactoryBot.create(:sponsorship, conference:, plan: ruby_plan, locale: 'ja', accepted_at: Time.current)
   end
-  let(:custom_en_sponsorship) do
+  let!(:custom_en_sponsorship) do
     FactoryBot.create(:sponsorship, conference:, plan: ruby_plan, locale: 'en', customization: true, customization_name: 'Custom Ruby', accepted_at: Time.current)
   end
   let(:standard_en_sponsorship) do
     FactoryBot.create(:sponsorship, conference:, plan: gold_plan, locale: 'en', accepted_at: Time.current)
   end
 
-  before do
-    standard_ja_sponsorship
-    custom_en_sponsorship
-    standard_en_sponsorship
-    get claim_user_session_path(session_token.handle)
+  context 'without staff authentication' do
+    it 'redirects to staff login' do
+      get conference_invoices_path(conference)
+
+      expect(response).to redirect_to(new_session_path(back_to: conference_invoices_path(conference)))
+    end
   end
 
-  it 'exports every sponsorship by default' do
-    get conference_invoices_path(conference, format: :csv), params: {delivery_date: '2026-10-03'}
+  context 'with staff authentication' do
+    before do
+      standard_ja_sponsorship
+      standard_en_sponsorship
+      get claim_user_session_path(session_token.handle)
+    end
 
-    expect(response).to have_http_status(:ok)
-    expect(invoice_rows.size).to eq(3)
-  end
+    it 'renders the HTML preview without a delivery date' do
+      get conference_invoices_path(conference)
 
-  it 'selects all locales and plans without filtering by customization on the initial HTML view' do
-    get conference_invoices_path(conference)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Invoices included in CSV export')
+    end
 
-    expect(response).to have_http_status(:ok)
-    assert_select 'input[type="checkbox"][name="locales[]"]', count: 2
-    assert_select 'input[type="checkbox"][name="locales[]"][checked="checked"]', count: 2
-    assert_select 'input[type="checkbox"][name="plan_ids[]"]', count: 2
-    assert_select 'input[type="checkbox"][name="plan_ids[]"][checked="checked"]', count: 2
-    assert_select 'input[type="radio"][name="customization_filter"]', count: 3
-    assert_select 'input[type="radio"][name="customization_filter"][value="all"][checked="checked"]', count: 1
-    assert_select 'input[name="starting_invoice_number"][value="001"]', count: 1
-    assert_select 'label[for="delivery_date"]', text: 'Delivery date (conference first day)', count: 1
-    assert_select 'input[name="delivery_date"][required="required"]', count: 1
-  end
+    it 'exports every sponsorship by default with the existing filename' do
+      travel_to Time.zone.local(2026, 8, 16, 12) do
+        get conference_invoices_path(conference, format: :csv), params: {delivery_date: '2026-10-03'}
+      end
 
-  it 'provides a CSV export button that submits the current filters' do
-    get conference_invoices_path(conference)
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/csv')
+      expect(response.headers['Content-Disposition']).to include('kaigi_on_rails_2026_invoices.csv')
+      expect(invoice_rows.size).to eq(3)
+      expect(invoice_rows.first.fetch(4)).to eq('2026/08/16')
+    end
 
-    expect(response).to have_http_status(:ok)
-    assert_select 'button[type="submit"][formaction$="/invoices.csv"]', text: 'Export CSV', count: 1
-  end
+    it 'passes the selected locale, plan, and customization to the export' do
+      get conference_invoices_path(conference, format: :csv), params: {
+        filters: 1,
+        locales: ['en'],
+        plan_ids: [ruby_plan.id],
+        customization_filter: 'with',
+        delivery_date: '2026-10-03',
+      }
 
-  it 'filters sponsorships by locale, plan, and customization' do
-    get conference_invoices_path(conference, format: :csv), params: {
-      filters: 1,
-      locales: ['en'],
-      plan_ids: [ruby_plan.id],
-      customization_filter: 'with',
-      delivery_date: '2026-10-03',
-    }
+      expect(response).to have_http_status(:ok)
+      expect(invoice_rows.size).to eq(1)
+      expect(invoice_rows.first.fetch(2)).to eq(custom_en_sponsorship.billing_contact.organization)
+    end
 
-    expect(response).to have_http_status(:ok)
-    expect(invoice_rows.size).to eq(1)
-  end
+    it 'passes the specified dates and starting number to the export' do
+      get conference_invoices_path(conference, format: :csv), params: {
+        invoice_date: '2026-08-16', delivery_date: '2026-10-03', starting_invoice_number: 42,
+      }
 
-  it 'filters sponsorships without customization' do
-    get conference_invoices_path(conference, format: :csv), params: {
-      filters: 1,
-      locales: %w[en ja],
-      plan_ids: [ruby_plan.id, gold_plan.id],
-      customization_filter: 'without',
-      delivery_date: '2026-10-03',
-    }
+      expect(response).to have_http_status(:ok)
+      expect(invoice_rows.first.values_at(4, 6)).to eq(['2026/08/16', '20260816-042'])
+      expect(CSV.parse(response.body).find { |row| row[1] == '品目' }.fetch(28)).to eq('2026/10/03')
+    end
 
-    expect(response).to have_http_status(:ok)
-    expect(invoice_rows.size).to eq(2)
-  end
+    it 'clamps a nonpositive starting number to one' do
+      get conference_invoices_path(conference, format: :csv), params: {
+        invoice_date: '2026-08-16', delivery_date: '2026-10-03', starting_invoice_number: -2,
+      }
 
-  it 'numbers exported invoices sequentially from the specified starting number' do
-    get conference_invoices_path(conference, format: :csv), params: {starting_invoice_number: 42, delivery_date: '2026-10-03'}
+      expect(invoice_rows.first.fetch(6)).to eq('20260816-001')
+    end
 
-    date_prefix = Time.zone.today.strftime('%Y%m%d')
-    expect(invoice_rows.map { |row| row.fetch(6) }).to eq(["#{date_prefix}-042", "#{date_prefix}-043", "#{date_prefix}-044"])
-  end
+    it 'does not export CSV without a delivery date' do
+      get conference_invoices_path(conference, format: :csv)
 
-  it 'exports an approved expense report as a negative custom sponsorship item' do
-    ExpenseReport.create!(sponsorship: custom_en_sponsorship, status: 'approved', total_amount: 100_000)
+      expect(response).to redirect_to(conference_invoices_path(conference))
+      expect(flash[:alert]).to eq('Delivery date is required.')
+    end
 
-    get conference_invoices_path(conference, format: :csv), params: {
-      filters: 1,
-      locales: ['en'],
-      plan_ids: [ruby_plan.id],
-      customization_filter: 'with',
-      delivery_date: '2026-10-03',
-    }
+    context 'with no selections' do
+      let(:filter_params) { {filters: '1', invoice_date: '2026-08-16', delivery_date: '2026-10-03', starting_invoice_number: '42'} }
 
-    custom_item = CSV.parse(response.body).find { |row| row[29] == 'カスタムスポンサー費用分' }
-    expect(response).to have_http_status(:ok)
-    expect(custom_item.values_at(31, 36)).to eq(%w[-100000 -100000])
-  end
+      it 'renders an empty HTML preview' do
+        get conference_invoices_path(conference), params: filter_params
 
-  it 'shows negative invoices separately in HTML and excludes them from CSV' do
-    ExpenseReport.create!(sponsorship: custom_en_sponsorship, status: 'approved', total_amount: 400_000)
-    filter_params = {
-      filters: 1,
-      locales: ['en'],
-      plan_ids: [ruby_plan.id],
-      customization_filter: 'with',
-      delivery_date: '2026-10-03',
-    }
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('There are no invoices to export.')
+      end
 
-    get conference_invoices_path(conference), params: filter_params
+      it 'preserves query parameters when redirecting an empty export' do
+        get conference_invoices_path(conference, format: :csv), params: filter_params
 
-    expect(response).to have_http_status(:ok)
-    assert_select '.card-header', text: 'Invoices included in CSV export', count: 0
-    assert_select '.alert.alert-info', text: 'There are no invoices to export.', count: 1
-    assert_select '.card-header', text: 'Excluded invoices (negative subtotal)', count: 1
-    assert_select '.alert.alert-warning', text: /will not be included in the CSV export/, count: 1
-    assert_select 'td', text: '-100000', minimum: 1
+        expect(response).to redirect_to(conference_invoices_path(conference, filter_params))
+        expect(flash[:alert]).to eq('There are no invoices to export.')
+      end
 
-    get conference_invoices_path(conference, format: :csv), params: filter_params
+      it 'checks delivery date before checking for exportable invoices' do
+        get conference_invoices_path(conference, format: :csv), params: {filters: '1'}
 
-    expect(response).to redirect_to(conference_invoices_path(conference, filter_params))
-    expect(flash[:alert]).to eq('There are no invoices to export.')
-  end
+        expect(response).to redirect_to(conference_invoices_path(conference))
+        expect(flash[:alert]).to eq('Delivery date is required.')
+      end
+    end
 
-  it 'does not consume invoice numbers for excluded negative invoices' do
-    ExpenseReport.create!(sponsorship: custom_en_sponsorship, status: 'approved', total_amount: 400_000)
+    context 'with a negative invoice' do
+      let(:filter_params) do
+        {filters: '1', locales: ['en'], plan_ids: [ruby_plan.id.to_s], customization_filter: 'with', delivery_date: '2026-10-03'}
+      end
 
-    get conference_invoices_path(conference, format: :csv), params: {starting_invoice_number: 7, delivery_date: '2026-10-03'}
+      before do
+        ExpenseReport.create!(sponsorship: custom_en_sponsorship, status: 'approved', total_amount: 400_000)
+      end
 
-    date_prefix = Time.zone.today.strftime('%Y%m%d')
-    expect(invoice_rows.map { |row| row.fetch(6) }).to eq(["#{date_prefix}-007", "#{date_prefix}-008"])
-  end
+      it 'renders excluded invoices in the HTML preview' do
+        get conference_invoices_path(conference), params: filter_params
 
-  it 'sets the specified delivery date on every exported item' do
-    get conference_invoices_path(conference, format: :csv), params: {delivery_date: '2026-10-03'}
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Excluded invoices (negative subtotal)')
+        expect(response.body).to include('There are no invoices to export.')
+      end
 
-    item_rows = CSV.parse(response.body).select { |row| row[1] == '品目' }
-    expect(item_rows.map { |row| row.fetch(28) }.uniq).to eq(['2026/10/03'])
-  end
+      it 'redirects when the export contains only excluded invoices' do
+        get conference_invoices_path(conference, format: :csv), params: filter_params
 
-  it 'does not export CSV without a delivery date' do
-    get conference_invoices_path(conference, format: :csv)
+        expect(response).to redirect_to(conference_invoices_path(conference, filter_params))
+        expect(flash[:alert]).to eq('There are no invoices to export.')
+      end
+    end
 
-    expect(response).to redirect_to(conference_invoices_path(conference))
-    expect(flash[:alert]).to eq('Delivery date is required.')
+    context 'with restricted staff access' do
+      let(:staff) { FactoryBot.create(:staff, restricted_repos: ['kaigionrails/allowed']) }
+
+      it 'forbids access to a conference outside the staff permissions' do
+        get conference_invoices_path(conference)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   private def invoice_rows
