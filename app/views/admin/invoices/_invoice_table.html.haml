@@ -6,10 +6,10 @@
         %table.card-body.table.table-hover.table-small{style: 'border-collapse: collapse; white-space: nowrap;width: 100%;'}
           %thead
             %tr
-              - rows.first.each do |heading|
+              - headers.each do |heading|
                 %th{scope: :col}= heading
           %tbody
-            - rows.drop(1).each do |row|
+            - rows.each do |row|
               %tr
                 - row.each do |column|
                   %td= column

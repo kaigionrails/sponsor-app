@@ -6,10 +6,7 @@ module Admin
 
     # https://biz.moneyforward.com/support/invoice/faq/invoice/invoice002.html
     def index
-      @invoice_date = params[:invoice_date].present? ? Date.parse(params[:invoice_date]) : Time.zone.today
-      @delivery_date = Date.parse(params[:delivery_date]) if params[:delivery_date].present?
-      @starting_invoice_number = [params[:starting_invoice_number].to_i, 1].max
-      @invoice_filter = InvoiceSponsorshipFilter.new(conference: @conference, params: invoice_filter_params)
+      prepare_invoice_inputs
       invoice_csv = MoneyForwardInvoiceCsv.new(
         conference: @conference,
         sponsorships: @invoice_filter.sponsorships,
@@ -20,18 +17,35 @@ module Admin
 
       respond_to do |format|
         format.html do
+          @invoice_headers = invoice_csv.headers
           @invoice_rows = invoice_csv.rows
           @excluded_invoice_rows = invoice_csv.excluded_rows
         end
-        format.csv do
-          if @delivery_date.blank?
-            redirect_to conference_invoices_path(@conference), alert: 'Delivery date is required.'
-          elsif invoice_csv.exportable?
-            send_data(invoice_csv.to_csv, filename: "#{@conference.name.underscore.gsub(" ", "_")}_invoices.csv")
-          else
-            redirect_to conference_invoices_path(@conference, request.query_parameters), alert: 'There are no invoices to export.'
-          end
-        end
+        format.csv { export_csv(invoice_csv) }
+      end
+    end
+
+    private def prepare_invoice_inputs
+      @invoice_date = params[:invoice_date].present? ? Date.parse(params[:invoice_date]) : Time.zone.today
+      @delivery_date = Date.parse(params[:delivery_date]) if params[:delivery_date].present?
+      @starting_invoice_number = [params[:starting_invoice_number].to_i, 1].max
+      filter_params = invoice_filter_params
+      @invoice_filter = InvoiceSponsorshipFilter.new(
+        conference: @conference,
+        filters: filter_params[:filters],
+        locales: filter_params[:locales],
+        plan_ids: filter_params[:plan_ids],
+        customization_filter: filter_params[:customization_filter],
+      )
+    end
+
+    private def export_csv(invoice_csv)
+      if @delivery_date.blank?
+        redirect_to conference_invoices_path(@conference), alert: 'Delivery date is required.'
+      elsif invoice_csv.exportable?
+        send_data(invoice_csv.to_csv, filename: "#{@conference.name.underscore.gsub(" ", "_")}_invoices.csv")
+      else
+        redirect_to conference_invoices_path(@conference, request.query_parameters), alert: 'There are no invoices to export.'
       end
     end
 
