@@ -2,7 +2,6 @@
 
 class MoneyForwardInvoiceCsv
   CSV_TYPE = 40_101
-  TAX_RATE = BigDecimal('0.1')
   NOTE = '払込手数料は、御社のご負担とさせていただきます。'
 
   COLUMNS = {
@@ -55,15 +54,15 @@ class MoneyForwardInvoiceCsv
   end
 
   def rows
-    @rows ||= build_rows(exportable_sponsorships, assign_invoice_numbers: true)
+    @rows ||= build_rows(exportable_invoices, assign_invoice_numbers: true)
   end
 
   def excluded_rows
-    @excluded_rows ||= build_rows(excluded_sponsorships, assign_invoice_numbers: false)
+    @excluded_rows ||= build_rows(excluded_invoices, assign_invoice_numbers: false)
   end
 
   def exportable?
-    exportable_sponsorships.any?
+    exportable_invoices.any?
   end
 
   def to_csv
@@ -74,36 +73,35 @@ class MoneyForwardInvoiceCsv
 
   private attr_reader :conference, :sponsorships, :invoice_date, :delivery_date, :starting_invoice_number
 
-  private def build_rows(selected_sponsorships, assign_invoice_numbers:)
-    [COLUMNS.values] + selected_sponsorships.each_with_index.flat_map do |sponsorship, index|
+  private def build_rows(selected_invoices, assign_invoice_numbers:)
+    [COLUMNS.values] + selected_invoices.each_with_index.flat_map do |invoice, index|
       invoice_number = starting_invoice_number + index if assign_invoice_numbers
-      sponsorship_rows(sponsorship, invoice_number)
+      invoice_rows(invoice, invoice_number)
     end
   end
 
-  private def exportable_sponsorships
-    sponsorships_by_invoice_sign.first
+  private def exportable_invoices
+    invoices_by_sign.first
   end
 
-  private def excluded_sponsorships
-    sponsorships_by_invoice_sign.last
+  private def excluded_invoices
+    invoices_by_sign.last
   end
 
-  private def sponsorships_by_invoice_sign
-    @sponsorships_by_invoice_sign ||= sponsorships.partition { |sponsorship| invoice_subtotal(sponsorship) >= 0 }
+  private def invoices_by_sign
+    @invoices_by_sign ||= sponsorships.map { |sponsorship| SponsorshipInvoice.new(sponsorship:) }.partition(&:exportable?)
   end
 
-  private def sponsorship_rows(sponsorship, invoice_number)
-    rows = [invoice_row(sponsorship, invoice_number), plan_item_row(sponsorship)]
-    rows << booth_item_row(sponsorship) if sponsorship.booth_assigned
-    rows << custom_sponsorship_item_row(sponsorship) if approved_expense_amount_in_yen(sponsorship).positive?
+  private def invoice_rows(invoice, invoice_number)
+    rows = [invoice_row(invoice, invoice_number), plan_item_row(invoice)]
+    rows << booth_item_row(invoice) if invoice.sponsorship.booth_assigned
+    rows << custom_sponsorship_item_row(invoice) if invoice.approved_expense_amount.positive?
     rows
   end
 
-  private def invoice_row(sponsorship, invoice_number)
+  private def invoice_row(invoice, invoice_number)
+    sponsorship = invoice.sponsorship
     contact = sponsorship.billing_contact
-    subtotal = invoice_subtotal(sponsorship)
-    tax = (subtotal * TAX_RATE).floor
 
     build_row(
       csv_type: CSV_TYPE,
@@ -115,9 +113,9 @@ class MoneyForwardInvoiceCsv
       invoice_number: formatted_invoice_number(invoice_number),
       sales_date: formatted_invoice_date,
       memo: sponsorship.plan.name,
-      subtotal:,
-      tax:,
-      total: subtotal + tax,
+      subtotal: invoice.subtotal,
+      tax: invoice.tax,
+      total: invoice.total,
       customer_title: '御中',
       customer_department: contact.unit,
       customer_contact_title: '',
@@ -126,41 +124,16 @@ class MoneyForwardInvoiceCsv
     )
   end
 
-  private def plan_item_row(sponsorship)
-    item_row("#{conference.name} 協賛費用 (#{sponsorship.plan.name})", plan_amount(sponsorship))
+  private def plan_item_row(invoice)
+    item_row("#{conference.name} 協賛費用 (#{invoice.sponsorship.plan.name})", invoice.plan_amount)
   end
 
-  private def booth_item_row(sponsorship)
-    item_row("#{conference.name} 協賛費用 (ブース出展)", booth_amount(sponsorship))
+  private def booth_item_row(invoice)
+    item_row("#{conference.name} 協賛費用 (ブース出展)", invoice.booth_amount)
   end
 
-  private def custom_sponsorship_item_row(sponsorship)
-    item_row('カスタムスポンサー費用分', -approved_expense_amount_in_yen(sponsorship))
-  end
-
-  private def approved_expense_amount_in_yen(sponsorship)
-    report = sponsorship.expense_report
-    return 0 unless sponsorship.customization && report&.status == 'approved'
-
-    amount_in_yen(report.total_amount || 0)
-  end
-
-  private def invoice_subtotal(sponsorship)
-    plan_amount(sponsorship) + booth_amount(sponsorship) - approved_expense_amount_in_yen(sponsorship)
-  end
-
-  private def plan_amount(sponsorship)
-    amount_in_yen(sponsorship.plan.price)
-  end
-
-  private def booth_amount(sponsorship)
-    return 0 unless sponsorship.booth_assigned
-
-    amount_in_yen(sponsorship.plan.price_booth)
-  end
-
-  private def amount_in_yen(amount)
-    amount.to_d.round(0, BigDecimal::ROUND_HALF_UP).to_i
+  private def custom_sponsorship_item_row(invoice)
+    item_row('カスタムスポンサー費用分', -invoice.approved_expense_amount)
   end
 
   private def item_row(name, price)
@@ -177,7 +150,7 @@ class MoneyForwardInvoiceCsv
   end
 
   private def tax_rate_label
-    "#{(TAX_RATE * 100).to_i}%"
+    "#{(SponsorshipInvoice::TAX_RATE * 100).to_i}%"
   end
 
   private def build_row(values)

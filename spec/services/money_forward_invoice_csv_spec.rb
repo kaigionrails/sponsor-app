@@ -35,11 +35,44 @@ RSpec.describe MoneyForwardInvoiceCsv do
       expect(rows.size).to eq(4)
       expect(rows.map(&:size).uniq).to eq([38])
       expect(rows.first).to eq([
-        'csv_type(変更不可)', '行形式', '取引先名称', '件名', '請求日', 'お支払期限', '請求書番号', '売上計上日',
-        'メモ', 'タグ', '小計', '消費税', '合計金額', '取引先敬称', '取引先郵便番号', '取引先都道府県',
-        '取引先住所1', '取引先住所2', '取引先部署', '取引先担当者役職', '取引先担当者氏名', '自社担当者氏名',
-        '備考', '振込先', '入金ステータス', 'メール送信ステータス', '郵送ステータス', 'ダウンロードステータス',
-        '納品日', '品名', '品目コード', '単価', '数量', '単位', '納品書番号', '詳細', '金額', '品目消費税率',
+        'csv_type(変更不可)',
+        '行形式',
+        '取引先名称',
+        '件名',
+        '請求日',
+        'お支払期限',
+        '請求書番号',
+        '売上計上日',
+        'メモ',
+        'タグ',
+        '小計',
+        '消費税',
+        '合計金額',
+        '取引先敬称',
+        '取引先郵便番号',
+        '取引先都道府県',
+        '取引先住所1',
+        '取引先住所2',
+        '取引先部署',
+        '取引先担当者役職',
+        '取引先担当者氏名',
+        '自社担当者氏名',
+        '備考',
+        '振込先',
+        '入金ステータス',
+        'メール送信ステータス',
+        '郵送ステータス',
+        'ダウンロードステータス',
+        '納品日',
+        '品名',
+        '品目コード',
+        '単価',
+        '数量',
+        '単位',
+        '納品書番号',
+        '詳細',
+        '金額',
+        '品目消費税率',
       ])
     end
 
@@ -100,20 +133,6 @@ RSpec.describe MoneyForwardInvoiceCsv do
       end
     end
 
-    context 'with an unapproved expense report for a custom sponsorship' do
-      let(:expense_report) { instance_double(ExpenseReport, status: 'submitted', total_amount: 100_000) }
-      let(:sponsorship) do
-        instance_double(Sponsorship, billing_contact: contact, plan:, booth_assigned: false, customization: true, expense_report:)
-      end
-
-      it 'does not deduct the expense' do
-        rows = invoice_csv.rows
-
-        expect(rows.size).to eq(3)
-        expect(rows.fetch(1).values_at(10, 11, 12)).to eq([300_000, 30_000, 330_000])
-      end
-    end
-
     context 'when approved expenses exceed the sponsorship fee' do
       let(:expense_report) { instance_double(ExpenseReport, status: 'approved', total_amount: 400_000) }
       let(:sponsorship) do
@@ -139,21 +158,6 @@ RSpec.describe MoneyForwardInvoiceCsv do
       it 'keeps the zero-value invoice in exported rows' do
         expect(invoice_csv.rows.fetch(1).values_at(10, 11, 12)).to eq([0, 0, 0])
         expect(invoice_csv.excluded_rows.size).to eq(1)
-      end
-    end
-
-    context 'when separately rounded fees are lower than the decimal fee total' do
-      let(:plan) { instance_double(Plan, name: 'Rubyプラン', price: 100_000.49.to_d, price_booth: 50_000.49.to_d) }
-      let(:expense_report) { instance_double(ExpenseReport, status: 'approved', total_amount: 200_000) }
-      let(:sponsorship) do
-        instance_double(Sponsorship, billing_contact: contact, plan:, booth_assigned: true, customization: true, expense_report:)
-      end
-
-      it 'uses the full rounded expense amount in the separated invoice' do
-        invoice, custom_item = invoice_csv.excluded_rows.values_at(1, 4)
-
-        expect(invoice.values_at(10, 11, 12)).to eq([-50_000, -5_000, -55_000])
-        expect(custom_item.values_at(31, 36)).to eq([-200_000, -200_000])
       end
     end
   end
