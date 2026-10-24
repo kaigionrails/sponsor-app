@@ -1,22 +1,17 @@
 # frozen_string_literal: true
 
 class InvoiceSponsorshipFilter
-  CUSTOMIZATION_OPTIONS = [
-    ['All', 'all'],
-    ['Customized only', 'with'],
-    ['Non-customized only', 'without'],
-  ].freeze
+  CUSTOMIZATION_VALUES = %w[all with without].freeze
 
   attr_reader :locales, :plans, :selected_locales, :selected_plan_ids, :customization_filter
 
-  def initialize(conference:, params:)
-    @params = params
+  def initialize(conference:, filters:, locales:, plan_ids:, customization_filter:)
     @base_scope = conference.sponsorships.active
     @locales = base_scope.reorder(nil).distinct.order(:locale).pluck(:locale)
     @plans = conference.plans.order(:rank, :id).to_a
-    @selected_locales = selected_values(:locales, locales)
-    @selected_plan_ids = selected_values(:plan_ids, plan_ids)
-    @customization_filter = selected_customization_filter
+    @selected_locales = selected_values(filters, locales, @locales)
+    @selected_plan_ids = selected_values(filters, plan_ids, plans.map { |plan| plan.id.to_s })
+    @customization_filter = CUSTOMIZATION_VALUES.include?(customization_filter) ? customization_filter : 'all'
   end
 
   def sponsorships
@@ -25,41 +20,12 @@ class InvoiceSponsorshipFilter
     ).includes_contacts.includes(:plan, :expense_report).order(:plan_id, :id)
   end
 
-  def customization_options
-    CUSTOMIZATION_OPTIONS
-  end
+  private attr_reader :base_scope
 
-  def locale_selected?(locale)
-    selected_locales.include?(locale)
-  end
+  private def selected_values(filters, values, default_values)
+    return default_values if filters.blank?
 
-  def plan_selected?(plan)
-    selected_plan_ids.include?(plan.id.to_s)
-  end
-
-  def customization_selected?(value)
-    customization_filter == value
-  end
-
-  private attr_reader :params, :base_scope
-
-  private def selected_values(key, default_values)
-    return default_values if params[:filters].blank?
-
-    Array(params[key]) & default_values
-  end
-
-  private def plan_ids
-    plans.map { |plan| plan.id.to_s }
-  end
-
-  private def selected_customization_filter
-    value = params[:customization_filter]
-    customization_values.include?(value) ? value : 'all'
-  end
-
-  private def customization_values
-    CUSTOMIZATION_OPTIONS.map(&:last)
+    Array(values) & default_values
   end
 
   private def filter_by_customization(scope)

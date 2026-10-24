@@ -9,7 +9,14 @@ module Admin
       @invoice_date = params[:invoice_date].present? ? Date.parse(params[:invoice_date]) : Time.zone.today
       @delivery_date = Date.parse(params[:delivery_date]) if params[:delivery_date].present?
       @starting_invoice_number = [params[:starting_invoice_number].to_i, 1].max
-      @invoice_filter = InvoiceSponsorshipFilter.new(conference: @conference, params: invoice_filter_params)
+      filter_params = invoice_filter_params
+      @invoice_filter = InvoiceSponsorshipFilter.new(
+        conference: @conference,
+        filters: filter_params[:filters],
+        locales: filter_params[:locales],
+        plan_ids: filter_params[:plan_ids],
+        customization_filter: filter_params[:customization_filter],
+      )
       invoice_csv = MoneyForwardInvoiceCsv.new(
         conference: @conference,
         sponsorships: @invoice_filter.sponsorships,

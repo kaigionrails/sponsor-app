@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe InvoiceSponsorshipFilter do
-  subject(:filter) { described_class.new(conference:, params: filter_params) }
+  subject(:filter) do
+    described_class.new(
+      conference:,
+      filters: filter_params[:filters],
+      locales: filter_params[:locales],
+      plan_ids: filter_params[:plan_ids],
+      customization_filter: filter_params[:customization_filter],
+    )
+  end
 
   let(:conference) { FactoryBot.create(:conference) }
   let!(:first_plan) { FactoryBot.create(:plan, conference:, rank: 2) }
